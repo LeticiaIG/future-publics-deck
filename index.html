@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Future Publics Deck: a digital hackpack based on Stuart Candy's The Thing from the Future, for deliberating urban futures. Deal six cards, lock, vary, invent, draw.">
+<meta name="color-scheme" content="light dark">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Future Publics Deck</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;1,300&display=swap">
+<style>
+/* Layout: a tabletop instrument. One device chassis per section; six knob modules make the hand; a black LCD reads the sentence;
+   round tactile keys drive the actions; the gallery is a rack of saved "patches". Warm grey plastic, black print, one orange signal. */
+:root{
+  --body:#cfceC7;        /* chassis plastic */
+  --panel:#e7e6e0;       /* module face */
+  --key:#f5f4ef;         /* white keys */
+  --key-shadow:#b7b6af;
+  --ink:#151515;
+  --muted:#6a6965;
+  --line:#aeada6;
+  --accent:#ff4d00;      /* signal orange */
+  --accent-ink:#1a0800;
+  --screen:#161616;
+  --screen-fg:#f2f0e8;
+  --screen-dim:#8a8880;
+  --led-off:#9d9c95;
+  --danger:#c8271a;
+  --f-display:"TE Grotesk", "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-mono:"TE Grotesk", "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-code:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+/* Univers if the viewer has it installed (the family the brand sets its site in), else Helvetica Neue, else the open Hanken Grotesk */
+@font-face{font-family:"TE Grotesk";font-weight:300;src:local("Univers 45 Light"),local("Univers-Light"),local("UniversLTStd-Light"),local("Univers LT Std 45 Light"),local("Helvetica Neue Light"),local("HelveticaNeue-Light")}
+@font-face{font-family:"TE Grotesk";font-weight:400;src:local("Univers 55 Roman"),local("Univers-Roman"),local("UniversLTStd"),local("Univers LT Std 55 Roman"),local("Univers"),local("Helvetica Neue"),local("HelveticaNeue")}
+@font-face{font-family:"TE Grotesk";font-weight:500;src:local("Univers 65 Bold"),local("Univers-Bold"),local("UniversLTStd-Bold"),local("Helvetica Neue Medium"),local("HelveticaNeue-Medium")}
+@font-face{font-family:"TE Grotesk";font-weight:300;font-style:italic;src:local("Univers 45 Light Oblique"),local("Univers-LightOblique"),local("Helvetica Neue Light Italic"),local("HelveticaNeue-LightItalic")}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --body:#1a1a19;--panel:#262625;--key:#343433;--key-shadow:#0d0d0c;--ink:#ecebe5;--muted:#9c9b95;--line:#45443f;
+  --accent:#ff5a14;--accent-ink:#1a0800;--screen:#0a0a0a;--screen-fg:#f4f2ea;--screen-dim:#7a7872;--led-off:#4a4945;--danger:#ff6a5b;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --body:#1a1a19;--panel:#262625;--key:#343433;--key-shadow:#0d0d0c;--ink:#ecebe5;--muted:#9c9b95;--line:#45443f;
+  --accent:#ff5a14;--accent-ink:#1a0800;--screen:#0a0a0a;--screen-fg:#f4f2ea;--screen-dim:#7a7872;--led-off:#4a4945;--danger:#ff6a5b;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--body);color:var(--ink);font-family:var(--f-mono);font-weight:300;font-size:15px;line-height:1.45;text-transform:lowercase;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 72px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);font-weight:300;letter-spacing:-.01em;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:clamp(2.2rem,5.5vw,4rem);font-weight:300;letter-spacing:-.02em}
+h2{font-size:1rem;font-weight:400;letter-spacing:.02em}
+h3{font-size:1.6rem;font-weight:300;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;color:var(--muted);font-weight:400}
+.lede{max-width:62ch;color:var(--muted);font-size:.9rem}
+.credit{max-width:62ch;font-size:.95rem;color:var(--ink);border-left:3px solid var(--accent);padding-left:12px}
+.credit em{font-style:italic;text-transform:none}
+.note{font-size:.76rem;color:var(--muted)}
+.note.err{color:var(--danger)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button{font:inherit;cursor:pointer;color:inherit}
+pre,textarea,input,select,option{text-transform:none}
+
+/* chassis */
+.device{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;display:flex;flex-direction:column;gap:16px;
+  box-shadow:0 1px 0 var(--key), inset 0 1px 0 rgba(255,255,255,.35)}
+.device::before,.device::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:var(--line);
+  box-shadow:inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--muted);top:9px}
+.device::before{left:9px}.device::after{right:9px}
+.rail{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.ribs{height:14px;flex:1 1 60px;max-width:180px;background:repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 6px);opacity:.8}
+.print{font-size:.72rem;letter-spacing:.04em;color:var(--muted)}
+
+/* keys */
+.key{display:inline-flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0}
+.key > span:first-child{width:54px;height:54px;border-radius:50%;background:var(--key);border:1px solid var(--line);
+  box-shadow:0 4px 0 var(--key-shadow), inset 0 1px 0 rgba(255,255,255,.6);display:grid;place-items:center;
+  font-family:var(--f-display);font-weight:400;font-size:.95rem;letter-spacing:0;transition:transform .06s, box-shadow .06s}
+.key.orange > span:first-child{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 4px 0 #a33000, inset 0 1px 0 rgba(255,255,255,.35)}
+.key:hover > span:first-child{transform:translateY(1px);box-shadow:0 3px 0 var(--key-shadow)}
+.key:active > span:first-child{transform:translateY(4px);box-shadow:0 0 0 var(--key-shadow)}
+.key.orange:active > span:first-child{box-shadow:0 0 0 #a33000}
+.key > span:last-child{font-size:.7rem;letter-spacing:.03em;color:var(--muted)}
+.key:disabled{opacity:.45;cursor:not-allowed}
+.btn{font-family:var(--f-mono);font-size:.78rem;font-weight:400;letter-spacing:.02em;background:var(--key);color:var(--ink);
+  border:1px solid var(--line);border-radius:6px;padding:.45rem .8rem;box-shadow:0 2px 0 var(--key-shadow);transition:transform .06s, box-shadow .06s;white-space:nowrap}
+.btn:hover{transform:translateY(1px);box-shadow:0 1px 0 var(--key-shadow)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.orange{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 2px 0 #a33000}
+.btn.ghost{box-shadow:none;background:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.tab{font-family:var(--f-mono);font-size:.74rem;font-weight:400;letter-spacing:.02em;border:1px solid var(--line);background:var(--key);color:var(--ink);padding:3px 10px;border-radius:999px}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+select,input[type=search],textarea,.card .add input,.manual input{font:inherit;font-size:.82rem;border:1px solid var(--line);border-radius:6px;background:var(--key);color:var(--ink);padding:.4rem .55rem;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+input::placeholder{color:var(--muted)}
+input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px}
+
+/* screen */
+.screen{background:var(--screen);color:var(--screen-fg);border-radius:8px;padding:16px 18px;font-family:var(--f-mono);font-weight:300;font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.4;
+  box-shadow:inset 0 0 0 1px #000, inset 0 2px 8px rgba(0,0,0,.6);position:relative;min-height:84px}
+.screen::before{content:"";position:absolute;inset:6px;border:1px solid rgba(255,255,255,.07);border-radius:4px;pointer-events:none}
+.screen mark{background:none;color:var(--accent)}
+.screen .dim{color:var(--screen-dim);font-size:.72rem;letter-spacing:.05em;display:block;margin-bottom:6px}
+
+/* header */
+header{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+.howto{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--panel)}
+.howto ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;font-size:.9rem;line-height:1.4}
+.howto ol li::marker{color:var(--accent);font-variant-numeric:tabular-nums}
+.howto b{font-weight:500}
+.howto .plate{max-width:none;margin-top:4px}
+@media (max-width:720px){header{grid-template-columns:1fr}}
+.plate{font-size:.78rem;letter-spacing:.01em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:10px 12px;max-width:420px;line-height:1.6}
+.plate b{color:var(--ink);font-weight:500}
+.jump{gap:4px 16px;font-size:.78rem;letter-spacing:.02em}
+.jump a{color:var(--ink);text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:1px}
+
+/* modules (the hand) */
+.deck{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:1000px){.deck{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.deck{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:400px){.deck{grid-template-columns:1fr}}
+.card{background:var(--key);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:260px;position:relative}
+.card.locked{box-shadow:inset 0 0 0 2px var(--accent)}
+.card .suit{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card .suit .eyebrow{font-size:.72rem;color:var(--ink);display:flex;flex-direction:column;gap:1px;min-width:0}
+.card .suit .eyebrow .es{font-size:.66rem;color:var(--muted)}
+.card .num{font-family:var(--f-display);font-weight:400;font-size:.72rem;color:var(--muted);margin-right:4px;font-variant-numeric:tabular-nums}
+.sw{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0}
+.sw .led{width:8px;height:8px;border-radius:50%;background:var(--led-off);box-shadow:inset 0 0 1px rgba(0,0,0,.4)}
+.sw[aria-pressed="true"] .led{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.sw .track{width:26px;height:14px;border-radius:7px;background:var(--line);position:relative;transition:background .12s}
+.sw .track::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--key);box-shadow:0 1px 1px rgba(0,0,0,.3);transition:left .12s}
+.sw[aria-pressed="true"] .track{background:var(--ink)}
+.sw[aria-pressed="true"] .track::after{left:14px}
+.card .val{font-family:var(--f-display);font-weight:300;font-size:1.35rem;line-height:1.1;letter-spacing:-.01em;flex:1;overflow-wrap:break-word}
+.card .val small{display:block;font-family:var(--f-mono);font-weight:400;font-size:.68rem;letter-spacing:.08em;color:var(--muted);margin-top:5px;text-transform:none}
+.knobrow{display:flex;align-items:center;gap:10px}
+.knob{width:46px;height:46px;border-radius:50%;flex:none;border:1px solid var(--line);background:radial-gradient(circle at 50% 40%, var(--panel), var(--key-shadow));
+  box-shadow:0 3px 0 var(--key-shadow), inset 0 1px 0 rgba(255,255,255,.5);position:relative;padding:0;transition:transform .15s}
+.knob::after{content:"";position:absolute;left:50%;top:4px;width:3px;height:14px;margin-left:-1.5px;background:var(--ink);border-radius:2px}
+.knob:active{transform:scale(.96)}
+.ticks{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ticks .scale{height:6px;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 7px)}
+.ticks .pos{font-size:.68rem;letter-spacing:.04em;color:var(--muted);font-variant-numeric:tabular-nums}
+.card select{width:100%;font-size:.78rem;padding:.3rem .4rem}
+.card .add{display:flex;gap:4px}
+.card .add input{flex:1;min-width:0;font-size:.74rem;border-style:dashed;padding:.25rem .45rem;box-shadow:none}
+.card .add .btn{padding:.15rem .5rem;font-size:.85rem;line-height:1}
+
+/* variations */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.tile{background:var(--key);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tile .slot{font-family:var(--f-display);font-weight:400;font-size:.72rem;letter-spacing:.05em;color:var(--muted);font-variant-numeric:tabular-nums}
+.tile .s{font-size:.84rem;line-height:1.5}
+.tile .s b{font-weight:500;color:var(--accent)}
+.tile .out{font-size:.84rem;color:var(--muted);min-height:1.2em}
+.tile .out strong{color:var(--ink);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.7rem;letter-spacing:.01em;border:1px solid var(--line);border-radius:999px;padding:1px 7px;white-space:nowrap;color:var(--muted)}
+.chip.k{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.manual{display:flex;gap:6px}
+.manual input{flex:1;min-width:0;font-size:.8rem}
+
+/* gallery: a grid of simple cards (image · title · text · the six cards); details fold the rest */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-items:start}
+.inv{background:var(--key);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.inv .pic{background:#fff;border-bottom:1px solid var(--line)}
+.dropwrap{display:flex;flex-direction:column;gap:8px;padding:12px 16px 0}
+.dropzone{border:2px dashed var(--line);border-radius:10px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:14px;cursor:pointer;background:var(--panel);color:var(--muted);transition:border-color .12s,background .12s}
+.dropzone:hover,.dropzone.over{border-color:var(--accent);color:var(--ink)}
+.dropzone .dz-ico{font-size:1.6rem;line-height:1;color:var(--accent)}
+.dropzone .dz-t{font-size:.92rem;color:var(--ink)}
+.inv .pic img{display:block;width:100%;height:auto;max-height:420px;object-fit:contain;background:#fff}
+.inv .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.inv h3{font-size:1.5rem}
+.pitch{font-size:.92rem;line-height:1.45}
+.tags{gap:6px 10px;min-height:1.2em}
+.example-tag{font-size:.7rem;letter-spacing:.02em;background:var(--accent);color:var(--accent-ink);padding:2px 8px;border-radius:999px}
+.example-tag.mine{background:var(--ink);color:var(--panel)}
+.chip.hot{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.actions{gap:6px}
+details.more{border-top:1px solid var(--line);padding-top:8px}
+details.more summary{cursor:pointer;font-size:.78rem;color:var(--muted)}
+details.more summary:hover{color:var(--ink)}
+.moreb{display:flex;flex-direction:column;gap:12px;padding-top:10px}
+.origin-s{font-size:.84rem;color:var(--muted);max-width:72ch}
+.origin-s b{color:var(--ink);font-weight:500}
+ol.steps{margin:0;padding-left:1.3em;font-size:.86rem;line-height:1.45;display:flex;flex-direction:column;gap:4px}
+ol.steps li::marker{color:var(--accent);font-variant-numeric:tabular-nums}
+.question{font-family:var(--f-display);font-weight:300;font-size:1.2rem;line-height:1.25;letter-spacing:-.01em}
+dl.brief{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:.84rem}
+dl.brief dt{font-size:.72rem;letter-spacing:.03em;color:var(--muted);padding-top:3px}
+dl.brief dd{margin:0}
+.pubform{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pubform input{font:inherit;font-size:.8rem;border:1px solid var(--line);border-radius:6px;background:var(--key);color:var(--ink);padding:.35rem .5rem;flex:1 1 150px;min-width:0}
+.prompt{display:flex;flex-direction:column;gap:10px}
+.prompt pre{margin:0;font-family:var(--f-code);font-size:.72rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--screen);color:var(--screen-fg);border-radius:8px;padding:12px 14px;max-height:200px;overflow:auto}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+input[type=search]{min-width:0;flex:1 1 200px;max-width:320px}
+details.edit summary{cursor:pointer;font-size:.85rem;letter-spacing:.02em}
+.editgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:14px}
+@media (max-width:1000px){.editgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.editgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.editgrid label{display:flex;flex-direction:column;gap:6px;font-size:.72rem;letter-spacing:.03em;color:var(--muted);min-width:0}
+.editgrid textarea{min-height:200px;font-size:.8rem;letter-spacing:0;font-family:var(--f-code);resize:vertical;width:100%;color:var(--ink)}
+.keys{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+details.import{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+details.import summary{cursor:pointer;font-size:.85rem}
+details.import textarea{width:100%;min-height:120px;font-family:var(--f-code);font-size:.76rem;resize:vertical;margin-top:10px;color:var(--ink)}
+details.import .row{margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="row" style="justify-content:space-between">
+        <span class="eyebrow">future publics · boston · thing-from-the-future hackpack · rev 6</span>
+        <div class="row" id="langSw" role="group" aria-label="language"><button class="tab" data-lang="es" aria-pressed="true">es</button><button class="tab" data-lang="en" aria-pressed="false">en</button></div>
+      </div>
+      <h1>Future Publics Deck</h1>
+      <p class="credit" data-i18n-html="credit"></p>
+      <p class="lede" data-i18n="lede"></p>
+      <nav class="row jump" aria-label="sections">
+        <a href="#h-hand" data-i18n="nav_table"></a><a href="#h-var" data-i18n="nav_var"></a><a href="#h-gal" data-i18n="nav_gal"></a><a href="#editor" data-i18n="nav_decks"></a>
+      </nav>
+    </div>
+    <div class="howto">
+      <span class="eyebrow" data-i18n="howto"></span>
+      <ol>
+        <li data-i18n-html="how1"></li>
+        <li data-i18n-html="how2"></li>
+        <li data-i18n-html="how3"></li>
+        <li data-i18n-html="how4"></li>
+      </ol>
+      <p class="plate" data-i18n-html="formula"></p>
+    </div>
+  </header>
+
+  <section class="device" aria-labelledby="h-hand">
+    <div class="rail">
+      <h2 id="h-hand" data-i18n="h_table"></h2>
+      <div class="ribs" aria-hidden="true"></div>
+      <span class="print" data-i18n="print_table"></span>
+    </div>
+    <div class="screen" id="screen"><span class="dim" data-i18n="now_playing"></span><span id="sentence"></span></div>
+    <div class="deck" id="deck"></div>
+    <div class="keys">
+      <button class="key orange" id="deal"><span data-i18n="k_deal_big"></span><span data-i18n="k_deal"></span></button>
+      <button class="key" id="vary"><span>×8</span><span data-i18n="k_vary"></span></button>
+      <p class="note" style="max-width:52ch;align-self:center" data-i18n-html="table_note"></p>
+    </div>
+  </section>
+
+  <section class="device" aria-labelledby="h-var" id="var-section">
+    <div class="rail">
+      <h2 id="h-var" data-i18n="h_var"></h2>
+      <div class="ribs" aria-hidden="true"></div>
+      <div class="row">
+        <label class="note" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="notech" checked> <span data-i18n="notech"></span></label>
+      </div>
+    </div>
+    <div class="keys">
+      <button class="key" id="inventAll"><span data-i18n="k_ai_big"></span><span data-i18n="k_ai"></span></button>
+      <button class="key" id="stopAll" hidden><span>■</span><span data-i18n="k_stop"></span></button>
+      <button class="key" id="copyPrompt"><span>⎘</span><span data-i18n="k_copy"></span></button>
+      <p class="note" id="aiNote" style="max-width:60ch;align-self:center"></p>
+    </div>
+    <div class="grid" id="grid"></div>
+    <details class="import" id="apiPanel" hidden>
+      <summary data-i18n="api_sum"></summary>
+      <p class="note" data-i18n="api_note"></p>
+      <div class="row">
+        <select id="apiProvider" data-i18n-label="api_provider"><option value="anthropic">claude (anthropic)</option><option value="openai">openai</option></select>
+        <input type="password" id="apiKey" placeholder="sk-…" autocomplete="off" spellcheck="false" aria-label="api key" style="flex:1 1 240px;min-width:0">
+        <input id="apiModel" list="models" data-i18n-ph="api_model_ph" data-i18n-label="api_model" autocomplete="off" style="flex:0 1 200px;min-width:0">
+        <datalist id="models"><option value="claude-sonnet-5-5"><option value="claude-haiku-5-5"><option value="claude-opus-5-5"><option value="gpt-4.1-mini"><option value="gpt-4o-mini"></datalist>
+        <input id="apiImageModel" data-i18n-ph="api_img_ph" data-i18n-label="api_img" autocomplete="off" style="flex:0 1 230px;min-width:0">
+        <label class="note" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="apiRemember"> <span data-i18n="api_remember"></span></label>
+        <button class="btn" id="apiSave" data-i18n="api_save"></button>
+        <button class="btn ghost" id="apiClear" data-i18n="api_clear"></button>
+      </div>
+      <p class="note" id="apiNote"></p>
+    </details>
+    <details class="import" id="import">
+      <summary data-i18n="imp_sum"></summary>
+      <p class="note" data-i18n="imp_note"></p>
+      <textarea id="importBox" placeholder='[{"i":0,"name":"…","pitch":"…","steps":["…"],"question":"…","visual":"…","blender":{…}}]' aria-label="json"></textarea>
+      <div class="row"><button class="btn" id="importBtn" data-i18n="imp_btn"></button><span class="note" id="importNote"></span></div>
+    </details>
+  </section>
+
+  <section class="device" aria-labelledby="h-gal">
+    <div class="rail">
+      <h2 id="h-gal"><span data-i18n="h_gal"></span> <span class="note" id="count"></span></h2>
+      <div class="ribs" aria-hidden="true"></div>
+      <div class="row">
+        <input type="search" id="q" data-i18n-ph="search_ph" data-i18n-label="search">
+        <button class="btn" id="copyJson" data-i18n="copy_json"></button>
+        <button class="btn" id="dlJson" hidden data-i18n="dl_json"></button>
+      </div>
+    </div>
+    <div class="row" id="galMode">
+      <button class="tab" data-mode="local" aria-pressed="true" data-i18n="tab_mine"></button>
+      <button class="tab" data-mode="shared" aria-pressed="false" data-i18n="tab_shared"></button>
+    </div>
+    <p class="note" id="sharedNote" hidden></p>
+    <div class="row" id="filters"></div>
+    <div class="row" id="filters2" hidden></div>
+    <div id="gallery" class="gallery"></div>
+  </section>
+
+  <details class="device edit" id="editor">
+    <summary data-i18n="ed_sum"></summary>
+    <div class="editgrid" id="editgrid"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="saveDecks" data-i18n="ed_save"></button>
+      <button class="btn ghost" id="resetDecks" data-i18n="ed_reset"></button>
+      <span class="note" id="deckNote"></span>
+    </div>
+  </details>
+</div>
+
+<script>
+/* Shared gallery (public site): a Supabase project. Fill url + anon public key; empty = shared gallery off. */
+const SHARED = { url: "", anonKey: "" };
+
+/* ---------- language ---------- */
+const I18N = {
+es: {
+  credit: 'versión digital basada en <em>The Thing from the Future</em>, el juego de cartas de Stuart Candy y Jeff Watson (Situation Lab, 2014), con dos cartas nuevas, <em>move</em> y <em>public</em>, para deliberar futuros urbanos.',
+  lede: 'Seis módulos, una pantalla y tres teclas. Gira los mandos para componer una mano, fija los que quieras mantener, explora variaciones y guarda cada invento con su dibujo, su storyboard y su brief para Blender.',
+  nav_table:'mesa', nav_var:'variaciones', nav_gal:'galería', nav_decks:'barajas',
+  howto:'cómo se juega',
+  how1:'<b>compón una mano.</b> gira los mandos o pulsa <b>dar</b>. con el interruptor fijas las cartas que quieres mantener.',
+  how2:'<b>abre variaciones.</b> pulsa <b>×8</b>: salen ocho combinaciones y solo cambian las cartas sin fijar.',
+  how3:'<b>inventa la cosa del futuro.</b> escríbela tú, pulsa <b>ia</b> (con tu clave) o copia el prompt y usa cualquier ia; luego importa la respuesta.',
+  how4:'<b>dibújala y compártela.</b> dibuja en papel, fotografíala desde la galería y, si quieres, publícala en la galería común con tu lugar.',
+  formula:'en un futuro de <b>[arco]</b>, hay <b>[objeto]</b> que tiene que ver con <b>[terreno]</b>, para <b>[público]</b>. el cambio: <b>[cambio]</b>. ¿qué es? evoca <b>[ánimo]</b>.',
+  h_table:'01 · mesa de juego', k_deal:'repartir', k_vary:'variar',
+  table_note:'Clic en un mando: siguiente carta. El interruptor con LED fija ese canal: las variaciones solo cambian el resto. La carta <b>cambio</b> (move) dice qué tipo de cambio sufre el objeto y evita que todo acabe en «un objeto que te sigue».',
+  h_var:'02 · variaciones', k_ai:'inventar ×8', k_copy:'copiar prompt',
+  api_sum:'usar tu propia api key (claude o openai) para que la tecla ia funcione aquí',
+  api_note:'la clave viaja directamente desde tu navegador al proveedor: esta página no tiene servidor y nadie más la ve. si marcas «recordar», queda guardada solo en este navegador; si no, se olvida al cerrar la pestaña.',
+  api_provider:'proveedor', api_model_ph:'modelo (opcional)', api_model:'modelo', api_img_ph:'modelo de imagen (openai: gpt-image-1)', api_img:'modelo de imagen', api_remember:'recordar', api_save:'activar', api_clear:'olvidar',
+  imp_sum:'importar respuesta json (de claude, chatgpt o cualquier ia)',
+  imp_note:'copia el prompt con la tecla ⎘, pégalo en el chat que prefieras y pega aquí la respuesta. cada invento se guarda en la galería con su slot.',
+  imp_btn:'importar',
+  h_gal:'03 · galería', search_ph:'buscar…', search:'buscar inventos', copy_json:'copiar json', dl_json:'descargar json',
+  tab_mine:'mías · este navegador', tab_shared:'común · todas las personas',
+  ed_sum:'04 · editar las barajas (una carta por línea)', ed_save:'guardar barajas', ed_reset:'restaurar iniciales',
+  sel_aria:'elegir carta de ', knob_title:'siguiente carta (shift: anterior; flechas del teclado)', knob_aria:': siguiente carta', lock_title:'fijar este canal en las variaciones', lock_aria:'fijar ',
+  added:'añadida: ', new_arc_ph:'nueva: Collapse · within a year', new_card_ph:'nueva carta…', add_aria:'añadir carta a ', add_title:'añadir a la baraja y usarla ahora',
+  grid_empty:'pulsa ×8 para generar combinaciones a partir de tu mano.', thinking:'pensando…', manual_ph:'o escribe tu propia idea…', manual_aria:'escribe tu idea para esta combinación', save:'guardar',
+  slot:'slot ', another:'otra idea', invent:'inventar', use_hand:'usar como mano',
+  err_401:'la clave no es válida o no tiene permiso ({st}). revísala en el panel de api key.', err_404:'el proveedor no reconoce ese modelo. cambia el nombre del modelo en el panel de api key.',
+  err_429:'el proveedor dice que hay demasiadas peticiones o sin crédito (429). espera o revisa tu cuenta.', err_provider:'error del proveedor ({st}). ', err_network:'no se pudo conectar con el proveedor. ¿hay red? ¿bloquea tu navegador la petición?',
+  err_na:'claude no está disponible en esta vista. puedes seguir escribiendo tus propias ideas.', err_rate:'demasiadas peticiones seguidas. espera un momento y vuelve a intentarlo.',
+  err_json:'la respuesta llegó incompleta o sin json. pulsa de nuevo para intentarlo.', err_refused:'claude no generó esta combinación. prueba con otra.', err_default:'no se pudo generar ahora. vuelve a intentarlo.',
+  thinking8:'pensando las ocho variaciones a la vez. suele tardar entre 30 y 90 segundos.', no_answer:'sin respuesta para esta combinación.', done8:'listo. los inventos se guardaron en la galería.',
+  copied:'copiado', selected:'seleccionado: copia con ⌘C', copy_prompt:'copiar prompt', tab_story:'storyboard · 6', tab_scene:'escena · 1', draw_prompt:'prompt para dibujarlo',
+  img_err:'no se pudo leer la imagen.', processing:'procesando…', change_drawing:'cambiar dibujo', upload_drawing:'subir dibujo', generating:'generando imagen… (10–40 s)', regen:'regenerar', gen:'generar imagen', remove_drawing:'quitar dibujo', upload_err:'no se pudo subir el dibujo: ',
+  all:'todos', place:'lugar', only_mine:'solo las mías',
+  name_ph:'tu nombre o colectivo (opcional)', name_aria:'nombre', place_ph:'lugar…', place_aria:'lugar', detecting:'detectando ciudad…', publishing:'publicando…', pub_err:'no se pudo publicar.', publish:'publicar', cancel:'cancelar',
+  place_hint:'lugar aproximado por tu conexión; corrígelo si quieres.', place_fail:'no se pudo detectar la ciudad; escríbela.', publish_shared:'publicar en la común',
+  mine_tag:'mía', anon:'anónimo', example:'ejemplo', yours:'tuyo', published:'publicada', vary_btn:'variar', copy_to_mine:'copiar a las mías', remove:'quitar', drawing_of:'dibujo de ',
+  more:'storyboard · pregunta · brief · prompt', rejected:'descartadas por obvias: ', deliberate:'para deliberar', blender_brief:'brief para blender',
+  shared_off:'la galería común no está activada en esta copia de la página.', shared_loading:'cargando la galería común…', shared_err:'no se pudo leer la galería común: ',
+  no_match:'ningún invento coincide con el filtro.', shared_empty:'todavía no hay inventos en la galería común. publica el primero desde «mías».', local_empty:'aún no hay inventos. genera variaciones y guarda las que te interesen.',
+  select_copy:'selecciona y copia', decks_saved:'barajas guardadas en este navegador.', decks_reset:'barajas restauradas.',
+  prompt_copied:'prompt copiado con las {n} combinaciones. pégalo en el chat que prefieras y trae la respuesta json al panel de importar.', prompt_copy_fail:'no se pudo copiar automáticamente: el prompt está en el panel de importar, selecciónalo y cópialo.',
+  key_first:'pega una clave primero.', activated:'activada: ', remembered:' · recordada en este navegador.', tab_only:' · solo en esta pestaña.', ai_on:'ai activada con tu clave. pulsa ai para inventar las {n} combinaciones.', key_forgotten:'clave olvidada.',
+  import_bad:'no es json válido. pega solo la lista que devolvió la ia.', imported:'{n} invento(s) importados a la galería.', import_none:'no se encontró ningún invento en el texto.',
+  ai_note_sample:'ia inventa las ocho combinaciones con storyboard, pregunta y brief para blender. se te pedirá permiso la primera vez. también puedes copiar el prompt y usar otra ia.',
+  ai_note_key:'ia activada con tu clave ({p}).', ai_note_nokey:'para usar la tecla ia aquí, pon tu api key en el panel de abajo. o copia el prompt con ⎘, pégalo en la ia que uses y trae la respuesta al panel de importar.', connecting:'conectando con claude…',
+  suit_arc:'cuándo y qué futuro', suit_terrain:'ámbito', suit_object:'forma', suit_move:'qué cambia', suit_mood:'emoción', suit_public:'para quién',
+  lab_arc:'arco', lab_terrain:'terreno', lab_object:'objeto', lab_move:'cambio', lab_mood:'ánimo', lab_public:'público',
+  print_table:'6 canales · fijar · dar', now_playing:'en juego', k_deal_big:'dar', k_ai_big:'ia', k_stop:'parar', notech:'sin tecnología',
+  dz_title:'sube tu dibujo o genera uno', dz_sub:'una foto del boceto en papel, o arrastra una imagen aquí', gen_nokey_copied:'prompt de escena copiado. pégalo en el generador de imágenes que uses y sube aquí el resultado. con una clave de openai en el panel de api key, la imagen se genera sola.', gen_nokey:'para generar imágenes aquí hace falta una clave de openai en el panel de api key; o copia el prompt de escena y úsalo en cualquier generador.',
+  del_shared:'eliminar de la común', del_sure:'¿seguro?', del_yes:'sí, eliminar', deleting:'eliminando…', del_err:'no se pudo eliminar.', del_denied:'solo puede eliminarla el navegador que la publicó.'
+},
+en: {
+  credit: 'a digital version based on <em>The Thing from the Future</em>, the card game by Stuart Candy and Jeff Watson (Situation Lab, 2014), with two new cards, <em>move</em> and <em>public</em>, for deliberating urban futures.',
+  lede: 'Six modules, one display and three keys. Turn the knobs to build a hand, lock the ones you want to keep, explore variations and save each invention with its drawing, its storyboard and its Blender brief.',
+  nav_table:'table', nav_var:'variations', nav_gal:'gallery', nav_decks:'decks',
+  howto:'how to play',
+  how1:'<b>build a hand.</b> turn the knobs or press <b>deal</b>. the switch locks the cards you want to keep.',
+  how2:'<b>open variations.</b> press <b>×8</b>: eight combinations appear and only unlocked cards change.',
+  how3:'<b>invent the thing from the future.</b> write it yourself, press <b>ai</b> (with your key) or copy the prompt into any chat; then import the answer.',
+  how4:'<b>draw it and share it.</b> draw on paper, photograph it from the gallery and, if you like, publish it to the shared gallery with your place.',
+  formula:'in a <b>[arc]</b> future, there is a <b>[object]</b> related to <b>[terrain]</b>, for <b>[public]</b>. the change: <b>[move]</b>. what is it? it evokes <b>[mood]</b>.',
+  h_table:'01 · game table', k_deal:'deal', k_vary:'vary',
+  table_note:'Click a knob: next card. The LED switch locks that channel: variations only change the rest. The <b>move</b> card says what kind of change the object goes through, and keeps everything from ending up as "an object that follows you".',
+  h_var:'02 · variations', k_ai:'invent ×8', k_copy:'copy prompt',
+  api_sum:'use your own api key (claude or openai) so the ai key works here',
+  api_note:'the key travels straight from your browser to the provider: this page has no server and nobody else sees it. tick "remember" to keep it in this browser only; otherwise it is forgotten when the tab closes.',
+  api_provider:'provider', api_model_ph:'model (optional)', api_model:'model', api_img_ph:'image model (openai: gpt-image-1)', api_img:'image model', api_remember:'remember', api_save:'activate', api_clear:'forget',
+  imp_sum:'import a json answer (from claude, chatgpt or any ai)',
+  imp_note:'copy the prompt with the ⎘ key, paste it in the chat you prefer and paste the answer here. each invention is saved to the gallery with its slot.',
+  imp_btn:'import',
+  h_gal:'03 · gallery', search_ph:'search…', search:'search inventions', copy_json:'copy json', dl_json:'download json',
+  tab_mine:'mine · this browser', tab_shared:'shared · everyone',
+  ed_sum:'04 · edit the decks (one card per line)', ed_save:'save decks', ed_reset:'restore defaults',
+  sel_aria:'choose card for ', knob_title:'next card (shift: previous; arrow keys)', knob_aria:': next card', lock_title:'lock this channel in variations', lock_aria:'lock ',
+  added:'added: ', new_arc_ph:'new: Collapse · within a year', new_card_ph:'new card…', add_aria:'add a card to ', add_title:'add to the deck and use it now',
+  grid_empty:'press ×8 to generate combinations from your hand.', thinking:'thinking…', manual_ph:'or write your own idea…', manual_aria:'write your idea for this combination', save:'save',
+  slot:'slot ', another:'another idea', invent:'invent', use_hand:'use as hand',
+  err_401:'the key is invalid or has no permission ({st}). check it in the api key panel.', err_404:'the provider does not know that model. change the model name in the api key panel.',
+  err_429:'the provider reports too many requests or no credit (429). wait or check your account.', err_provider:'provider error ({st}). ', err_network:'could not reach the provider. is there a network? is your browser blocking the request?',
+  err_na:'claude is not available in this view. you can keep writing your own ideas.', err_rate:'too many requests in a row. wait a moment and try again.',
+  err_json:'the answer came back incomplete or without json. press again to retry.', err_refused:'claude did not generate this combination. try another.', err_default:'could not generate right now. try again.',
+  thinking8:'thinking about all eight variations at once. this usually takes 30 to 90 seconds.', no_answer:'no answer for this combination.', done8:'done. the inventions were saved to the gallery.',
+  copied:'copied', selected:'selected: copy with ⌘C', copy_prompt:'copy prompt', tab_story:'storyboard · 6', tab_scene:'scene · 1', draw_prompt:'prompt to draw it',
+  img_err:'could not read the image.', processing:'processing…', change_drawing:'change drawing', upload_drawing:'upload drawing', generating:'generating image… (10–40 s)', regen:'regenerate', gen:'generate image', remove_drawing:'remove drawing', upload_err:'could not upload the drawing: ',
+  all:'all', place:'place', only_mine:'only mine',
+  name_ph:'your name or collective (optional)', name_aria:'name', place_ph:'place…', place_aria:'place', detecting:'detecting city…', publishing:'publishing…', pub_err:'could not publish.', publish:'publish', cancel:'cancel',
+  place_hint:'approximate place from your connection; edit it if you like.', place_fail:'could not detect the city; type it.', publish_shared:'publish to shared',
+  mine_tag:'mine', anon:'anonymous', example:'example', yours:'yours', published:'published', vary_btn:'vary', copy_to_mine:'copy to mine', remove:'remove', drawing_of:'drawing of ',
+  more:'storyboard · question · brief · prompt', rejected:'discarded as obvious: ', deliberate:'to deliberate', blender_brief:'blender brief',
+  shared_off:'the shared gallery is not enabled in this copy of the page.', shared_loading:'loading the shared gallery…', shared_err:'could not read the shared gallery: ',
+  no_match:'no invention matches the filter.', shared_empty:'no inventions in the shared gallery yet. publish the first one from "mine".', local_empty:'no inventions yet. generate variations and save the ones you like.',
+  select_copy:'select and copy', decks_saved:'decks saved in this browser.', decks_reset:'decks restored.',
+  prompt_copied:'prompt copied with the {n} combinations. paste it in the chat you prefer and bring the json answer to the import panel.', prompt_copy_fail:'could not copy automatically: the prompt is in the import panel, select and copy it.',
+  key_first:'paste a key first.', activated:'activated: ', remembered:' · remembered in this browser.', tab_only:' · this tab only.', ai_on:'ai activated with your key. press ai to invent the {n} combinations.', key_forgotten:'key forgotten.',
+  import_bad:'not valid json. paste only the list the ai returned.', imported:'{n} invention(s) imported to the gallery.', import_none:'no invention found in the text.',
+  ai_note_sample:'ai invents the eight combinations with storyboard, question and blender brief. you will be asked for permission the first time. you can also copy the prompt and use another ai.',
+  ai_note_key:'ai activated with your key ({p}).', ai_note_nokey:'to use the ai key here, put your api key in the panel below. or copy the prompt with ⎘, paste it in the ai you use and bring the answer to the import panel.', connecting:'connecting to claude…',
+  suit_arc:'when and which future', suit_terrain:'domain', suit_object:'form', suit_move:'what changes', suit_mood:'feeling', suit_public:'for whom',
+  lab_arc:'arc', lab_terrain:'terrain', lab_object:'object', lab_move:'move', lab_mood:'mood', lab_public:'public',
+  print_table:'6 ch · lock · deal', now_playing:'now playing', k_deal_big:'deal', k_ai_big:'ai', k_stop:'stop', notech:'no tech',
+  dz_title:'upload your drawing or generate one', dz_sub:'a photo of the paper sketch, or drag an image here', gen_nokey_copied:'scene prompt copied. paste it in the image generator you use and upload the result here. with an openai key in the api key panel, the image is generated by itself.', gen_nokey:'generating images here needs an openai key in the api key panel; or copy the scene prompt and use any generator.',
+  del_shared:'delete from shared', del_sure:'sure?', del_yes:'yes, delete', deleting:'deleting…', del_err:'could not delete.', del_denied:'only the browser that published it can delete it.'
+}};
+let uiLang = (() => { try{ const v = localStorage.getItem("fp.lang"); if (v === "en" || v === "es") return v; }catch(e){} return (navigator.language||"es").toLowerCase().startsWith("es") ? "es" : "en"; })();
+const t = (k, vars) => { let v = (I18N[uiLang] && I18N[uiLang][k]) ?? I18N.es[k] ?? k; if (vars) for (const [a,b] of Object.entries(vars)) v = v.split("{"+a+"}").join(b); return v; };
+function applyLang(){
+  document.documentElement.lang = uiLang;
+  document.querySelectorAll("[data-i18n]").forEach(e => e.textContent = t(e.dataset.i18n));
+  document.querySelectorAll("[data-i18n-html]").forEach(e => e.innerHTML = t(e.dataset.i18nHtml));
+  document.querySelectorAll("[data-i18n-ph]").forEach(e => e.placeholder = t(e.dataset.i18nPh));
+  document.querySelectorAll("[data-i18n-label]").forEach(e => e.setAttribute("aria-label", t(e.dataset.i18nLabel)));
+  document.querySelectorAll("#langSw .tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === uiLang)));
+}
+function mapHand(h, ol, nl){
+  const od = decksAll[ol], nd = decksAll[nl], out = {...h};
+  for (const s of SUITS){ const i = od[s.k].indexOf(h[s.k]); if (i >= 0 && i < DEFAULTS[ol][s.k].length && i < nd[s.k].length) out[s.k] = nd[s.k][i]; }
+  return out;
+}
+function switchLang(nl){
+  const ol = uiLang; if (nl === ol) return;
+  hand = mapHand(hand, ol, nl); batch = batch.map(h => mapHand(h, ol, nl));
+  uiLang = nl; decks = decksAll[nl]; try{ localStorage.setItem("fp.lang", uiLang); }catch(e){}
+  save(); applyLang(); renderHand(); renderEditor(); renderGrid(); renderGallery();
+}
+document.querySelectorAll("#langSw .tab").forEach(b => b.onclick = () => switchLang(b.dataset.lang));
+
+const SUITS = [
+  {k:"arc", label:"Arc"},
+  {k:"terrain", label:"Terrain"},
+  {k:"object", label:"Object"},
+  {k:"move", label:"Move"},
+  {k:"mood", label:"Mood"},
+  {k:"public", label:"Public"}
+];
+const DEFAULTS = {
+en: {
+  arc: ["Grow · within a decade","Grow · within a generation","Grow · within a century",
+        "Collapse · within a decade","Collapse · within a generation","Collapse · within a century",
+        "Discipline · within a decade","Discipline · within a generation","Discipline · within a century",
+        "Transform · within a decade","Transform · within a generation","Transform · within a century"],
+  terrain: ["Mobility","Housing","Density","Energy","Water & flooding","Corner shops","Public space","Urban nature","Heat & climate","City government",
+            "Walking","Perceived safety","Noise & silence","Light & darkness","Meeting strangers","Neighborhood memory","Waiting","Animals & plants","Play in the street","Belonging"],
+  object: ["Streetlight","Bench","Bus stop","Sidewalk","Tree","Box","Mailbox","Fence","Crosswalk","Facade","Fountain","Bicycle rack","Planter","Street sign","Trash bin","Doorstep","Bridge","Window",
+           "A warning sign","A fine or ticket","A lost-and-found notice","A complaint letter","A school rule","A lullaby","A job posting","A map legend","A graffiti","A holiday","A smell","A sound at a fixed hour","A funeral","A menu","A queue","A key"],
+  move: ["It is no longer owned by anyone","It only exists at certain hours","It is maintained by children","It is forbidden now","It is made of something alive","It outlives the service it was built for",
+         "It was removed, and something took its place","It costs time instead of money","It is shared with another species","It became a ritual","You must ask permission to use it","It is broken on purpose",
+         "It is inherited","It belongs to the dead","It is rationed","It asks instead of telling","It is slow on purpose","A rule is set by the slowest","It leaves its fixed place","It has a voice in the council"],
+  mood: ["Wonder","Joy","Calm","Tenderness","Surprise","Nostalgia","Unease","Pride","Curiosity","Relief","Melancholy","Delight"],
+  public: ["A child walking to school","An older person at night","A newcomer to the city","A night-shift worker","Someone in a wheelchair","A teenager","A future generation","A migrating bird","A street tree","A shop owner","A tourist","A neighbor of 40 years"]
+},
+es: {
+  arc: ["Crecimiento · dentro de una década","Crecimiento · dentro de una generación","Crecimiento · dentro de un siglo",
+        "Colapso · dentro de una década","Colapso · dentro de una generación","Colapso · dentro de un siglo",
+        "Disciplina · dentro de una década","Disciplina · dentro de una generación","Disciplina · dentro de un siglo",
+        "Transformación · dentro de una década","Transformación · dentro de una generación","Transformación · dentro de un siglo"],
+  terrain: ["la movilidad","la vivienda","la densidad","la energía","el agua y las inundaciones","el comercio de barrio","el espacio público","la naturaleza urbana","el calor y el clima","el gobierno de la ciudad",
+            "caminar","la seguridad percibida","el ruido y el silencio","la luz y la oscuridad","encontrarse con desconocidos","la memoria del barrio","la espera","los animales y las plantas","jugar en la calle","la pertenencia"],
+  object: ["una farola","un banco","una parada de autobús","una acera","un árbol","una caja","un buzón","una valla","un paso de peatones","una fachada","una fuente","un aparcabicis","una jardinera","una señal de calle","una papelera","un umbral","un puente","una ventana",
+           "una señal de advertencia","una multa","un aviso de objetos perdidos","una carta de queja","una norma escolar","una nana","una oferta de empleo","la leyenda de un mapa","un grafiti","una fiesta","un olor","un sonido a una hora fija","un funeral","un menú","una cola","una llave"],
+  move: ["Ya no es de nadie","Solo existe a ciertas horas","Lo mantienen los niños","Ahora está prohibido","Está hecho de algo vivo","Sobrevive al servicio para el que se construyó",
+         "Lo quitaron, y algo ocupó su lugar","Cuesta tiempo en vez de dinero","Se comparte con otra especie","Se convirtió en un ritual","Hay que pedir permiso para usarlo","Está roto a propósito",
+         "Se hereda","Pertenece a los muertos","Está racionado","Pregunta en vez de decir","Es lento a propósito","La regla la marca el más lento","Deja su sitio fijo","Tiene voz en el consejo"],
+  mood: ["Asombro","Alegría","Calma","Ternura","Sorpresa","Nostalgia","Inquietud","Orgullo","Curiosidad","Alivio","Melancolía","Deleite"],
+  public: ["una niña que va al colegio","una persona mayor de noche","alguien recién llegado a la ciudad","alguien que trabaja de noche","alguien en silla de ruedas","un adolescente","una generación futura","un pájaro migratorio","un árbol de la calle","la dueña de una tienda","un turista","un vecino de toda la vida"]
+}};
+const EXAMPLES_EN = [
+  { id:"ex-streetlight", example:true, lang:"en", createdAt:1,
+    hand:{arc:"Transform · within a generation", terrain:"Perceived safety", object:"Streetlight", move:"It leaves its fixed place", mood:"Wonder", public:"An older person at night"},
+    name:"Butterfly Lights",
+    pitch:"Streetlights that leave their poles. By day they rest together as a butterfly sculpture in the plaza; at night they fly to wherever someone is walking.",
+    steps:["A streetlight. Everyone trusts a streetlight.","Add a presence sensor. Any parking lot has one.","Let it move three meters, to where it's needed.","Let it learn where it's needed, night after night.","Give it wings. It flies with you.","By day, a sculpture of butterflies in the plaza. At night, they fly to wherever you are."],
+    question:"If light follows people instead of streets, who decides which bodies get lit first, and what happens to the dark corners no one walks?",
+    visual:"A person walking home at night followed by a glowing streetlight with butterfly wings; in the background, a plaza sculpture made of resting lamp-butterflies.",
+    blender:{scene:"A Boston side street at dusk: brick row houses, one plaza at the end, a single pole streetlight.", motion:"Lamp detaches, wings unfold, follows a walker along a curved path; final shot: lamps cluster on a central trunk as a sculpture.", light:"Warm sodium cone with stippled falloff; ambient blue night.", sound:"Soft wing flaps, footsteps, a low hum that fades when the lamp lands."}
+  },
+  { id:"ex-bench", example:true, lang:"en", createdAt:2,
+    hand:{arc:"Transform · within a generation", terrain:"Mobility", object:"Bench", move:"It is slow on purpose", mood:"Joy", public:"A neighbor of 40 years"},
+    name:"Slow Benches",
+    pitch:"Benches that drift slowly along the sidewalk, carrying people a few blocks while they talk to whoever sits beside them.",
+    steps:["A bench at a bus stop.","It tells you when the bus is late.","It rolls a few meters into the shade.","It learns which neighbors like to sit together.","It carries two strangers to the next corner.","Mobility becomes a conversation, not a commute."],
+    question:"Does mobility always need to be fast, or could some of our trips be designed for encounter?",
+    visual:"Two strangers laughing on a wooden bench that glides slowly down a tree-lined sidewalk, small wheels under its legs.",
+    blender:{scene:"A wide sidewalk on a Boston main street, mid-morning.", motion:"Bench glides at walking pace, pauses at corners, people sit and stand.", light:"Bright daylight, dappled tree shade.", sound:"Street ambience, two voices, a gentle wheel creak."}
+  },
+  { id:"ex-busstop", example:true, lang:"en", createdAt:3,
+    hand:{arc:"Collapse · within a decade", terrain:"Mobility", object:"Bus stop", move:"It outlives the service it was built for", mood:"Tenderness", public:"An older person at night"},
+    name:"The Last Stop",
+    pitch:"When bus routes are cut, the shelter stays and becomes the place where the neighborhood picks each other up.",
+    steps:["A bus stop on Blue Hill Avenue.","The screen says “delayed.” Then it says nothing.","The route is cut, but the shelter stays.","A neighbor pins a ride board inside.","The shelter rings a bell when someone waits too long.","Nobody waits alone: the stop is where the neighborhood picks each other up."],
+    question:"When public systems retreat, who fills the gap, and is it fair to ask neighbors to?",
+    visual:"An older woman waiting at night in a bus shelter covered in handwritten ride notes, a small bell glowing above her, a neighbor's cargo bike pulling up.",
+    blender:{scene:"Blue Hill Avenue at night, an empty road, one lit bus shelter.", motion:"Paper notes accumulate on the shelter walls; a bell swings; a cargo bike arrives and the woman climbs in.", light:"Single warm light inside the shelter, cold street lamps fading out.", sound:"Distant traffic, a soft bell, a bicycle chain, two voices greeting."}
+  },
+  { id:"ex-sidewalk", example:true, lang:"en", createdAt:4,
+    hand:{arc:"Discipline · within a generation", terrain:"Mobility", object:"Sidewalk", move:"A rule is set by the slowest", mood:"Calm", public:"A child walking to school"},
+    name:"Seven-Year-Old Speed",
+    pitch:"Around schools, the city adopts the pace of its slowest walker as the rule for everyone.",
+    steps:["A sidewalk outside a school in Jamaica Plain.","Painted footprints mark the walk to school.","During school hours, cars must yield the whole street.","The pavement warms and glows where children step.","Traffic is rerouted around children, not children around traffic.","For one hour each morning, the city moves at the pace of a seven-year-old."],
+    question:"What if speed limits were set by the slowest person instead of the fastest vehicle?",
+    visual:"A child walking to school down the middle of a street, glowing footprints under her feet, cars waiting patiently at the edges.",
+    blender:{scene:"A residential street in Jamaica Plain beside a brick school, early morning.", motion:"Footprints light up one by one under a walking child; parked cars slide aside; a crowd of kids fills the street.", light:"Low golden morning sun, soft glow from the pavement.", sound:"Birds, children's chatter, the absence of engines."}
+  },
+  { id:"ex-bridge", example:true, lang:"en", createdAt:5,
+    hand:{arc:"Transform · within a century", terrain:"Mobility", object:"Bridge", move:"It is shared with another species", mood:"Wonder", public:"A migrating bird"},
+    name:"Flyway Bridge",
+    pitch:"A bridge over the Charles that people share with migrating birds: half crossing, half wetland, slow on purpose.",
+    steps:["A bridge over the Charles River.","Planters line the railings.","A lane is given back to reeds and water.","Birds start resting there during migration.","People slow down to cross without disturbing them.","Half bridge, half wetland: crossing becomes a seasonal ritual."],
+    question:"Is mobility only for humans, or should infrastructure also move and shelter other species?",
+    visual:"A long arched bridge whose deck is half reeds and shallow water, a flock of birds landing while people walk quietly on a narrow path beside them.",
+    blender:{scene:"A bridge over the Charles River with the Boston skyline behind, autumn.", motion:"Car lane dissolves into reeds over time; a flock lands and settles; pedestrians walk slowly.", light:"Soft overcast autumn light, reflections on the water.", sound:"Wind in reeds, wing beats, water lapping, footsteps on wood."}
+  },
+  { id:"ex-sign", example:true, lang:"en", createdAt:6,
+    hand:{arc:"Grow · within a decade", terrain:"Mobility", object:"Street sign", move:"It asks instead of telling", mood:"Curiosity", public:"A newcomer to the city"},
+    name:"Signs That Ask",
+    pitch:"Street signs that tell you where neighbors usually walk, and ask newcomers where they are trying to go.",
+    steps:["A street sign in East Boston.","It adds a second language.","It shows where neighbors usually walk from here.","Residents leave short voice notes about each direction.","The sign asks newcomers where they're trying to go.","Wayfinding becomes a welcome: you arrive knowing someone walked this way before."],
+    question:"Do our signs assume you already belong?",
+    visual:"A newcomer with a suitcase stopping at a street sign covered in arrows, small speaker grilles and handwritten words in several languages.",
+    blender:{scene:"A corner in East Boston with triple-deckers and the harbor in the distance.", motion:"Arrows on the sign rotate and multiply; speech-bubble shapes pop out when a person stops.", light:"Bright late afternoon light.", sound:"Overlapping voices in several languages giving directions, harbor gulls."}
+  }
+];
+const EXAMPLES_ES = [
+  { id:"ex-farola", example:true, lang:"es", createdAt:1,
+    hand:{arc:"Transformación · dentro de una generación", terrain:"la seguridad percibida", object:"una farola", move:"Deja su sitio fijo", mood:"Asombro", public:"una persona mayor de noche"},
+    name:"Farolas mariposa",
+    pitch:"Farolas que abandonan su poste. De día descansan juntas como una escultura de mariposas en la plaza; de noche vuelan hasta donde alguien camina.",
+    steps:["Una farola. Todo el mundo confía en una farola.","Añade un sensor de presencia. Cualquier aparcamiento tiene uno.","Deja que se mueva tres metros, hasta donde hace falta.","Deja que aprenda dónde hace falta, noche tras noche.","Dale alas. Vuela contigo.","De día, una escultura de mariposas en la plaza. De noche, vuelan hasta donde estés."],
+    question:"Si la luz sigue a las personas y no a las calles, ¿quién decide qué cuerpos se iluminan primero, y qué pasa con los rincones oscuros por los que nadie camina?",
+    visual:"Una persona volviendo a casa de noche seguida por una farola luminosa con alas de mariposa; al fondo, una escultura en la plaza hecha de farolas-mariposa en reposo.",
+    blender:{scene:"Una calle secundaria de Boston al anochecer: casas de ladrillo, una plaza al final, una sola farola.", motion:"La lámpara se desprende, despliega alas y sigue a un caminante por una curva; plano final: las lámparas se agrupan en un tronco central como escultura.", light:"Cono cálido de sodio con caída punteada; noche azul ambiental.", sound:"Aleteos suaves, pasos, un zumbido grave que se apaga cuando la lámpara se posa."}
+  },
+  { id:"ex-banco", example:true, lang:"es", createdAt:2,
+    hand:{arc:"Transformación · dentro de una generación", terrain:"la movilidad", object:"un banco", move:"Es lento a propósito", mood:"Alegría", public:"un vecino de toda la vida"},
+    name:"Bancos lentos",
+    pitch:"Bancos que se deslizan despacio por la acera y llevan a la gente unas manzanas mientras conversa con quien se sienta al lado.",
+    steps:["Un banco en una parada de autobús.","Te avisa cuando el autobús va tarde.","Rueda unos metros hasta la sombra.","Aprende qué vecinos prefieren sentarse juntos.","Lleva a dos desconocidos hasta la siguiente esquina.","La movilidad se vuelve conversación, no trayecto."],
+    question:"¿La movilidad tiene que ser siempre rápida, o algunos de nuestros trayectos podrían diseñarse para el encuentro?",
+    visual:"Dos desconocidos riendo en un banco de madera que se desliza despacio por una acera arbolada, con ruedas pequeñas bajo las patas.",
+    blender:{scene:"Una acera ancha en una calle principal de Boston, media mañana.", motion:"El banco avanza al paso, se detiene en las esquinas, la gente se sienta y se levanta.", light:"Luz de día intensa, sombra moteada de los árboles.", sound:"Ambiente de calle, dos voces, un leve chirrido de rueda."}
+  },
+  { id:"ex-parada", example:true, lang:"es", createdAt:3,
+    hand:{arc:"Colapso · dentro de una década", terrain:"la movilidad", object:"una parada de autobús", move:"Sobrevive al servicio para el que se construyó", mood:"Ternura", public:"una persona mayor de noche"},
+    name:"La última parada",
+    pitch:"Cuando recortan las rutas de autobús, la marquesina se queda y se convierte en el lugar donde el barrio se recoge entre sí.",
+    steps:["Una parada de autobús en Blue Hill Avenue.","La pantalla dice «retrasado». Luego no dice nada.","Cortan la ruta, pero la marquesina se queda.","Una vecina cuelga dentro un tablón de viajes compartidos.","La marquesina hace sonar una campana cuando alguien espera demasiado.","Nadie espera solo: la parada es donde el barrio se recoge entre sí."],
+    question:"Cuando el sistema público se retira, ¿quién llena el vacío, y es justo pedírselo a los vecinos?",
+    visual:"Una mujer mayor esperando de noche en una marquesina cubierta de notas manuscritas de viajes, una campanita encendida sobre ella, la bici de carga de un vecino llegando.",
+    blender:{scene:"Blue Hill Avenue de noche, una calzada vacía, una sola marquesina iluminada.", motion:"Las notas de papel se acumulan en las paredes; una campana oscila; llega una bici de carga y la mujer sube.", light:"Una sola luz cálida dentro de la marquesina, farolas frías apagándose.", sound:"Tráfico lejano, una campana suave, una cadena de bici, dos voces saludándose."}
+  },
+  { id:"ex-acera", example:true, lang:"es", createdAt:4,
+    hand:{arc:"Disciplina · dentro de una generación", terrain:"la movilidad", object:"una acera", move:"La regla la marca el más lento", mood:"Calma", public:"una niña que va al colegio"},
+    name:"Velocidad de siete años",
+    pitch:"Alrededor de las escuelas, la ciudad adopta como regla para todos el ritmo de quien camina más despacio.",
+    steps:["Una acera frente a un colegio de Jamaica Plain.","Huellas pintadas marcan el camino al colegio.","En horario escolar, los coches ceden toda la calle.","El pavimento se entibia y brilla donde pisan los niños.","Se desvía el tráfico alrededor de los niños, no los niños alrededor del tráfico.","Una hora cada mañana, la ciudad se mueve al ritmo de una niña de siete años."],
+    question:"¿Y si los límites de velocidad los fijara la persona más lenta y no el vehículo más rápido?",
+    visual:"Una niña caminando al colegio por el centro de la calle, huellas luminosas bajo sus pies, coches esperando pacientes en los bordes.",
+    blender:{scene:"Una calle residencial de Jamaica Plain junto a un colegio de ladrillo, primera hora de la mañana.", motion:"Las huellas se encienden una a una bajo una niña que camina; los coches aparcados se apartan; una multitud de niños llena la calle.", light:"Sol dorado bajo, brillo suave del pavimento.", sound:"Pájaros, charla de niños, la ausencia de motores."}
+  },
+  { id:"ex-puente", example:true, lang:"es", createdAt:5,
+    hand:{arc:"Transformación · dentro de un siglo", terrain:"la movilidad", object:"un puente", move:"Se comparte con otra especie", mood:"Asombro", public:"un pájaro migratorio"},
+    name:"Puente de paso migratorio",
+    pitch:"Un puente sobre el Charles que la gente comparte con las aves migratorias: mitad cruce, mitad humedal, lento a propósito.",
+    steps:["Un puente sobre el río Charles.","Jardineras recorren las barandillas.","Un carril se devuelve a los juncos y al agua.","Las aves empiezan a descansar ahí durante la migración.","La gente cruza más despacio para no molestarlas.","Mitad puente, mitad humedal: cruzar se vuelve un ritual de temporada."],
+    question:"¿La movilidad es solo para humanos, o la infraestructura también debería mover y acoger a otras especies?",
+    visual:"Un largo puente arqueado cuyo tablero es mitad juncos y agua somera, una bandada posándose mientras la gente camina en silencio por un sendero estrecho al lado.",
+    blender:{scene:"Un puente sobre el Charles con el skyline de Boston detrás, otoño.", motion:"El carril de coches se disuelve en juncos con el tiempo; una bandada se posa y se asienta; los peatones caminan despacio.", light:"Luz suave de otoño nublado, reflejos en el agua.", sound:"Viento en los juncos, aleteos, agua lamiendo, pasos sobre madera."}
+  },
+  { id:"ex-senal", example:true, lang:"es", createdAt:6,
+    hand:{arc:"Crecimiento · dentro de una década", terrain:"la movilidad", object:"una señal de calle", move:"Pregunta en vez de decir", mood:"Curiosidad", public:"alguien recién llegado a la ciudad"},
+    name:"Señales que preguntan",
+    pitch:"Señales de calle que cuentan por dónde suelen caminar los vecinos y preguntan a quien acaba de llegar adónde intenta ir.",
+    steps:["Una señal de calle en East Boston.","Añade un segundo idioma.","Muestra por dónde suelen caminar los vecinos desde aquí.","Los residentes dejan notas de voz breves sobre cada dirección.","La señal pregunta a los recién llegados adónde intentan ir.","Orientarse se vuelve una bienvenida: llegas sabiendo que alguien caminó antes por aquí."],
+    question:"¿Nuestras señales asumen que ya perteneces al lugar?",
+    visual:"Alguien con una maleta detenido ante una señal de calle cubierta de flechas, pequeñas rejillas de altavoz y palabras escritas a mano en varios idiomas.",
+    blender:{scene:"Una esquina de East Boston con triple-deckers y el puerto al fondo.", motion:"Las flechas de la señal giran y se multiplican; aparecen bocadillos de voz cuando alguien se detiene.", light:"Luz brillante de media tarde.", sound:"Voces superpuestas en varios idiomas dando indicaciones, gaviotas del puerto."}
+  }
+];
+
+/* ---------- storage (per-viewer convenience) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let decksAll = store.get("fp.decks2", null) || { en: store.get("fp.decks", null) || structuredClone(DEFAULTS.en), es: structuredClone(DEFAULTS.es) };
+for (const L of ["en","es"]){ if (!decksAll[L]) decksAll[L] = structuredClone(DEFAULTS[L]); for (const k in DEFAULTS[L]) if (!decksAll[L][k]) decksAll[L][k] = structuredClone(DEFAULTS[L][k]); }
+let decks = null; /* set once the language is known */
+let locks = store.get("fp.locks", {});
+let hand = store.get("fp.hand", null);
+let inventions = store.get("fp.inventions", null) || [];
+let removedEx = store.get("fp.removedEx", []);
+for (const ex of [...EXAMPLES_EN, ...EXAMPLES_ES]){
+  if (removedEx.includes(ex.id)) continue;
+  const i = inventions.findIndex(v => v.id === ex.id);
+  if (i === -1) inventions.push(structuredClone(ex)); else inventions[i] = structuredClone(ex);
+}
+let batch = [];
+let terrainFilter = "", placeFilter = "", onlyMine = false, galMode = "local";
+let shared = [], sharedLoaded = false, sharedError = "";
+const authorId = (() => { let id = store.get("fp.author", null); if (!id){ id = "a-" + Math.random().toString(36).slice(2,10) + Date.now().toString(36); store.set("fp.author", id); } return id; })();
+const ownerToken = (() => { let tkn = store.get("fp.owner", null); if (!tkn){ tkn = "o-" + Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,"0")).join(""); store.set("fp.owner", tkn); } return tkn; })();
+const SHARED_COLS = "id,created_at,author_id,author_name,place,lang,hand,name,pitch,steps,question,visual,blender,rejected,image_url";
+const sharedOK = () => !!(SHARED.url && SHARED.anonKey);
+async function sbFetch(path, opts={}){
+  const r = await fetch(SHARED.url.replace(/\/$/,"") + "/rest/v1/" + path, {...opts,
+    headers:{"apikey":SHARED.anonKey, "authorization":"Bearer "+SHARED.anonKey, "content-type":"application/json", "prefer":"return=representation", ...(opts.headers||{})}});
+  if (!r.ok) throw new Error((await r.text()).slice(0,200));
+  const txt = await r.text(); return txt ? JSON.parse(txt) : null;
+}
+async function deleteShared(id){
+  const res = await sbFetch("inventions?id=eq." + encodeURIComponent(id), {method:"DELETE", headers:{"x-owner-token": ownerToken}});
+  if (!Array.isArray(res) || !res.length) throw new Error(t("del_denied"));
+  shared = shared.filter(r => r.id !== id);
+  for (const v of inventions) if (v.sharedId === id){ delete v.sharedId; }
+  save();
+}
+async function loadShared(){
+  try{ shared = await sbFetch("inventions?select=" + SHARED_COLS + "&order=created_at.desc&limit=400"); sharedLoaded = true; sharedError = ""; }
+  catch(e){ sharedError = t("shared_err") + e.message; }
+}
+async function detectPlace(){
+  const c = store.get("fp.place", null); if (c) return c;
+  for (const [url, pick] of [["https://ipapi.co/json/", j=>[j.city, j.country_name]], ["https://ipwho.is/", j=>[j.city, j.country]]]){
+    try{ const j = await (await fetch(url)).json(); const p = pick(j).filter(Boolean).join(", "); if (p){ store.set("fp.place", p); return p; } }catch(e){}
+  }
+  return "";
+}
+async function publishInvention(v, authorName, place){
+  const row = { author_id: authorId, owner_token: ownerToken, author_name: authorName || null, place: place || null, lang: uiLang,
+    hand: v.hand, name: v.name, pitch: v.pitch || "", steps: v.steps || [], question: v.question || "", visual: v.visual || "", blender: v.blender || null, rejected: v.rejected || [], image_url: v.imageUrl || null };
+  const res = await sbFetch("inventions", {method:"POST", body: JSON.stringify(row)});
+  const saved = Array.isArray(res) ? res[0] : res;
+  v.sharedId = saved && saved.id || true; v.place = place || ""; v.author = authorName || ""; save();
+  if (saved) shared.unshift(saved);
+}
+const fromRow = r => ({ id:"sh-"+r.id, shared:true, mine: r.author_id === authorId, author: r.author_name || "", place: r.place || "", createdAt: Date.parse(r.created_at) || 0,
+  hand: r.hand || {}, name: r.name || "", pitch: r.pitch || "", steps: r.steps || [], question: r.question || "", visual: r.visual || "", blender: r.blender || null, rejected: r.rejected || [], imageUrl: r.image_url || "" });
+
+const $ = s => document.querySelector(s);
+const el = (tag, attrs={}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [a,v] of Object.entries(attrs)){
+    if (a === "class") n.className = v;
+    else if (a.startsWith("on")) n.addEventListener(a.slice(2), v);
+    else if (v === true) n.setAttribute(a, "");
+    else if (v !== false && v != null) n.setAttribute(a, v);
+  }
+  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : String(k));
+  return n;
+};
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const parseArc = a => { const [type, when] = String(a).split("·").map(s=>s.trim()); return {type, when: when || ""}; };
+const pad = n => String(n).padStart(2,"0");
+
+function deal(base){
+  const h = {};
+  for (const s of SUITS) h[s.k] = (locks[s.k] && base && base[s.k]) ? base[s.k] : pick(decks[s.k]);
+  return h;
+}
+const lc1 = x => { x = String(x||""); return x.charAt(0).toLowerCase() + x.slice(1); };
+function sentenceParts(h){
+  const {type, when} = parseArc(h.arc);
+  if (uiLang === "es"){
+    const parts = [["En un futuro de "],[type.toLowerCase()+(when?", "+when:""),1],[", hay "],[lc1(h.object),1],[" que tiene que ver con "],[lc1(h.terrain),1],[", para "],[lc1(h.public),1],["."]];
+    if (h.move) parts.push([" El cambio: "],[lc1(h.move),1],["."]);
+    parts.push([" ¿Qué es? Evoca "],[String(h.mood||"").toLowerCase(),1],["."]);
+    return parts;
+  }
+  const art = /^[aeiou]/i.test(h.object) ? "an" : "a";
+  const obj = /^a /i.test(h.object) ? h.object.slice(2).toLowerCase() : h.object.toLowerCase();
+  const parts = [["In a "],[type.toLowerCase()+" future"+(when?", "+when:""),1],[", there is "+art+" "],[obj,1],[" related to "],[h.terrain.toLowerCase(),1],[", for "],[lc1(h.public),1],["."]];
+  if (h.move) parts.push([" The change: "],[lc1(h.move),1],["."]);
+  parts.push([" What is it? It evokes "],[h.mood.toLowerCase(),1],["."]);
+  return parts;
+}
+function sentenceText(h){ return sentenceParts(h).map(p=>p[0]).join(""); }
+function sentenceNode(h, tag="mark"){ return sentenceParts(h).map(([t,b]) => b ? el(tag,{},t) : t); }
+
+/* ---------- hand: six knob modules ---------- */
+function step(k, dir){
+  const list = decks[k]; const i = list.indexOf(hand[k]);
+  hand[k] = list[(i + dir + list.length) % list.length]; save(); renderHand();
+}
+function renderHand(){
+  const deck = $("#deck"); deck.replaceChildren();
+  SUITS.forEach((s, n) => {
+    const v = hand[s.k];
+    const arc = s.k === "arc" ? parseArc(v) : null;
+    const list = decks[s.k]; const idx = Math.max(0, list.indexOf(v));
+    const angle = list.length > 1 ? -150 + (idx / (list.length - 1)) * 300 : 0;
+    const sel = el("select",{id:"sel-"+s.k,"aria-label":t("sel_aria")+t("lab_"+s.k), onchange:e=>{hand[s.k]=e.target.value; save(); renderHand();}},
+      list.map(c => el("option",{value:c, selected: c===v}, c)));
+    if (!list.includes(v)) sel.prepend(el("option",{value:v, selected:true}, v));
+    const knob = el("button",{class:"knob", id:"knob-"+s.k, title:t("knob_title"), "aria-label":t("lab_"+s.k)+t("knob_aria"),
+      onclick:e=>step(s.k, e.shiftKey ? -1 : 1),
+      onkeydown:e=>{ if (e.key==="ArrowRight"||e.key==="ArrowUp"){ e.preventDefault(); step(s.k,1);} if (e.key==="ArrowLeft"||e.key==="ArrowDown"){ e.preventDefault(); step(s.k,-1);} }});
+    knob.style.transform = `rotate(${angle}deg)`;
+    deck.append(el("div",{class:"card"+(locks[s.k]?" locked":"")},
+      el("div",{class:"suit"},
+        el("span",{class:"eyebrow"}, el("span",{}, el("span",{class:"num"}, pad(n+1)), t("lab_"+s.k)), el("small",{class:"es"}, t("suit_"+s.k))),
+        el("button",{class:"sw","aria-pressed":String(!!locks[s.k]), title:t("lock_title"), "aria-label":t("lock_aria")+t("lab_"+s.k),
+          onclick:()=>{locks[s.k]=!locks[s.k]; save(); renderHand();}}, el("span",{class:"led"}), el("span",{class:"track"}))),
+      el("div",{class:"val"}, arc ? arc.type : v, arc && arc.when ? el("small",{},arc.when) : null),
+      el("div",{class:"knobrow"}, knob,
+        el("div",{class:"ticks"}, el("div",{class:"scale"}), el("span",{class:"pos"}, pad(idx+1)+" / "+pad(list.length)))),
+      sel,
+      el("form",{class:"add", onsubmit:e=>{
+          e.preventDefault();
+          const inp = e.target.elements[0]; const nv = inp.value.trim(); if (!nv) return;
+          if (!decks[s.k].includes(nv)) decks[s.k].push(nv);
+          hand[s.k] = nv; save(); renderEditor(); renderHand();
+          const f = document.getElementById("add-"+s.k); if (f) f.placeholder = t("added")+t;
+        }},
+        el("input",{id:"add-"+s.k, placeholder: s.k==="arc" ? t("new_arc_ph") : t("new_card_ph"), "aria-label":t("add_aria")+t("lab_"+s.k)}),
+        el("button",{class:"btn ghost",type:"submit",title:t("add_title")},"+"))));
+  });
+  $("#sentence").replaceChildren(...sentenceNode(hand));
+}
+
+/* ---------- variations ---------- */
+let sample = null;
+const tileState = new Map();
+function renderGrid(){
+  const g = $("#grid"); g.replaceChildren();
+  if (!batch.length){
+    g.append(el("p",{class:"note"},t("grid_empty")));
+    return;
+  }
+  batch.forEach((h, i) => {
+    const st = tileState.get(i) || {};
+    const chips = el("div",{class:"chips"}, SUITS.map(s => el("span",{class:"chip"+(locks[s.k]?" k":"")}, s.k==="arc" ? String(h.arc||"").replace(" · within "," · ").replace(" · dentro de "," · ") : h[s.k])));
+    const out = el("p",{class:"out"+(st.err?" note err":"")});
+    if (st.busy) out.textContent = st.text || t("thinking");
+    else if (st.err) out.textContent = st.err;
+    else if (st.inv) out.append(el("strong",{}, st.inv.name), " — ", st.inv.pitch);
+    const manual = el("form",{class:"manual", onsubmit:e=>{ e.preventDefault(); const tx = e.target.elements[0].value.trim(); if(!tx) return;
+        addInvention({hand:h, name:tx.split(/[.:—-]/)[0].slice(0,60), pitch:tx, steps:[], question:"", blender:null}); e.target.reset(); }},
+      el("input",{id:"man-"+i, placeholder:t("manual_ph"),"aria-label":t("manual_aria")}),
+      el("button",{class:"btn ghost",type:"submit"},t("save")));
+    g.append(el("article",{class:"tile"},
+      el("span",{class:"slot"}, t("slot")+pad(i+1)),
+      el("p",{class:"s"}, sentenceNode(h,"b")),
+      chips, out,
+      el("div",{class:"row"},
+        canAI() ? el("button",{class:"btn", disabled: !!st.busy, onclick:()=>inventOne(i)}, st.inv ? t("another") : t("invent")) : null,
+        el("button",{class:"btn ghost", onclick:()=>{ hand = {...h}; save(); renderHand(); window.scrollTo({top:0,behavior:"smooth"}); }}, t("use_hand"))),
+      manual));
+  });
+}
+function vary(n=8){
+  batch = Array.from({length:n}, () => deal(hand));
+  tileState.clear(); renderGrid();
+}
+
+/* ---------- Claude ---------- */
+function buildPrompt(hands){
+  const lang = uiLang === "es" ? "Spanish" : "English";
+  const notech = $("#notech").checked;
+  const techRule = notech
+    ? `FORBIDDEN: the object may not gain any technological feature. No sensors, screens, apps, AI, drones, robots, nothing that "follows you", "learns", "glows", "detects" or "moves by itself". The change must be social, legal, material, temporal, economic, ecological or relational.`
+    : `Technology is allowed only if the Move card calls for it, and never as the point of the idea. Prefer social, legal, material, temporal, economic, ecological or relational changes. Never "it follows you", "it learns", "it glows".`;
+  return `You are helping an urban anthropologist at the MIT Media Lab run an experiential-futures game (an adaptation of Stuart Candy's "The Thing from the Future") for public deliberation on Boston's future. Each combination has six cards: Arc (type of future + time horizon), Terrain (domain), Object (the form the thing takes: a piece of the street, or an artifact like a sign, a fine, a rule, a song), Move (the KIND of change it undergoes), Mood (the feeling it must evoke) and Public (who lives this future).
+
+For EACH combination invent one "thing from the future" set in a real Boston street context. Method, in this order:
+1. Start from the END. Imagine the strangest credible version of this object in that future as the Public encounters it. Write the step-6 caption first.
+2. Reverse archaeology: steps 5, 4, 3, 2, 1 explain how we got there, each a small plausible change, with step 1 being the ordinary object everyone trusts today.
+3. The Move card dictates what kind of change happens. ${techRule}
+4. The Public is the protagonist: their need, fear or habit drives the invention. The Mood is a constraint, not decoration.
+5. Before answering, write three obvious ideas and reject them. The answer must not be any of them. Avoid "a thing that moves with you" unless the Move card says so.
+Be concrete, sensory and surprising. The idea must work as an animated scene in Blender.
+
+Write in ${lang}. Reply with only a JSON array, one object per combination in the same order:
+[{"i":0,"name":"2-4 words","rejected":["three obvious ideas you discarded, 6 words each"],"pitch":"one or two sentences","steps":["six short captions, max 14 words each, in order 1 to 6"],"question":"one open question this future raises for public deliberation","visual":"one sentence describing the single most telling image of this future: who is in it, what the object is doing, where","blender":{"scene":"setting","motion":"what moves and how","light":"lighting","sound":"soundscape"}}]
+
+Card values may be written in Spanish or English; keep their meaning.
+
+Combinations:
+${hands.map((h,i)=>`${i}. Arc: ${h.arc} | Terrain: ${h.terrain} | Object: ${h.object} | Move: ${h.move} | Mood: ${h.mood} | Public: ${h.public}`).join("\n")}`;
+}
+/* ---------- own API key (public site; the artifact uses the viewer's Claude instead) ---------- */
+let api = store.get("fp.api", null);
+try{ if (!api){ const s = sessionStorage.getItem("fp.api"); if (s) api = JSON.parse(s); } }catch(e){}
+const apiDefaultModel = p => p === "openai" ? "gpt-4.1-mini" : "claude-sonnet-5-5";
+const canAI = () => !!(sample || (api && api.key));
+async function apiAsk(prompt, signal){
+  const provider = api.provider || "anthropic", key = api.key, model = api.model || apiDefaultModel(provider);
+  let r;
+  try{
+    if (provider === "openai"){
+      r = await fetch("https://api.openai.com/v1/chat/completions", {method:"POST", signal,
+        headers:{"content-type":"application/json", "authorization":"Bearer "+key},
+        body:JSON.stringify({model, messages:[{role:"system", content:"Reply with only the JSON requested, no prose, no code fences."},{role:"user", content:prompt}]})});
+    } else {
+      r = await fetch("https://api.anthropic.com/v1/messages", {method:"POST", signal,
+        headers:{"content-type":"application/json", "x-api-key":key, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({model, max_tokens:8000, system:"Reply with only the JSON requested, no prose, no code fences.", messages:[{role:"user", content:prompt}]})});
+    }
+  }catch(e){ throw {code: e && e.name === "AbortError" ? "cancelled" : "network", message:String(e)}; }
+  if (!r.ok){ let msg = ""; try{ msg = (await r.json()).error?.message || ""; }catch(e){} throw {code:"api_"+r.status, message:msg}; }
+  const j = await r.json();
+  return provider === "openai" ? (j.choices?.[0]?.message?.content || "") : (j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("");
+}
+function parseLoose(t){
+  const s = String(t).replace(/```[a-z]*\n?/gi, "");
+  const a = s.indexOf("["), b = s.lastIndexOf("]"), o = s.indexOf("{"), c = s.lastIndexOf("}");
+  const cut = (a >= 0 && b > a) ? s.slice(a, b+1) : (o >= 0 && c > o ? s.slice(o, c+1) : s);
+  return JSON.parse(cut);
+}
+async function askJSON(prompt, signal){
+  if (sample) return sample.json(prompt, {cache:false, signal});
+  if (api && api.key){ const t = await apiAsk(prompt, signal); try{ return parseLoose(t); }catch(e){ throw {code:"invalid_json", text:t}; } }
+  throw {code:"not_granted"};
+}
+function errCopy(e){
+  const code = e && e.code || "";
+  if (code.startsWith("api_")){
+    const st = Number(code.slice(4));
+    if (st === 401 || st === 403) return t("err_401",{st});
+    if (st === 404) return t("err_404");
+    if (st === 429) return t("err_429");
+    return t("err_provider",{st}) + (e.message || "");
+  }
+  switch(code){
+    case "network": return t("err_network");
+    case "not_granted": case "sampling_disabled": case "capability_disabled": case "not_declared": case "capability_removed":
+      return t("err_na");
+    case "rate_limited": return t("err_rate");
+    case "invalid_json": return t("err_json");
+    case "refused": return t("err_refused");
+    case "cancelled": return "";
+    default: return t("err_default");
+  }
+}
+function hideAI(e){
+  if (sample && ["not_granted","sampling_disabled","capability_disabled","not_declared","capability_removed"].includes(e && e.code)){
+    sample = null; $("#inventAll").hidden = !canAI(); $("#aiNote").textContent = errCopy(e); renderGrid(); return true;
+  }
+  return false;
+}
+function normalize(o, h){
+  if (!o || typeof o !== "object") return null;
+  const steps = Array.isArray(o.steps) ? o.steps.map(String).slice(0,6) : [];
+  const b = o.blender && typeof o.blender === "object" ? o.blender : null;
+  return { hand:h, name:String(o.name||"Untitled thing"), pitch:String(o.pitch||""), steps, question:String(o.question||""), visual:String(o.visual||""),
+    rejected: Array.isArray(o.rejected) ? o.rejected.map(String).slice(0,3) : [],
+    blender: b ? {scene:String(b.scene||""), motion:String(b.motion||""), light:String(b.light||""), sound:String(b.sound||"")} : null };
+}
+async function inventOne(i){
+  const h = batch[i]; tileState.set(i,{busy:true}); renderGrid();
+  try{
+    const arr = await askJSON(buildPrompt([h]));
+    const inv = normalize(Array.isArray(arr) ? arr[0] : arr, h);
+    if (!inv) throw {code:"invalid_json"};
+    tileState.set(i,{inv}); addInvention(inv);
+  }catch(e){ if (hideAI(e)) return; tileState.set(i,{err:errCopy(e)}); }
+  renderGrid();
+}
+let allCtl = null;
+async function inventAll(){
+  if (!batch.length) vary();
+  allCtl = new AbortController();
+  $("#inventAll").disabled = true; $("#stopAll").hidden = false;
+  batch.forEach((_,i)=>tileState.set(i,{busy:true})); renderGrid();
+  $("#aiNote").textContent = t("thinking8");
+  try{
+    const arr = await askJSON(buildPrompt(batch), allCtl.signal);
+    const list = Array.isArray(arr) ? arr : [];
+    batch.forEach((h,i)=>{
+      const raw = list.find(o => o && Number(o.i) === i) || list[i];
+      const inv = normalize(raw, h);
+      if (inv){ tileState.set(i,{inv}); addInvention(inv, false); } else tileState.set(i,{err:t("no_answer")});
+    });
+    $("#aiNote").textContent = t("done8");
+    renderGallery();
+  }catch(e){
+    if (!hideAI(e)){ batch.forEach((_,i)=>tileState.set(i,{})); $("#aiNote").textContent = errCopy(e); }
+  }finally{
+    $("#inventAll").disabled = false; $("#stopAll").hidden = true; renderGrid();
+  }
+}
+
+/* ---------- gallery ---------- */
+function addInvention(inv, rerender=true){
+  inventions.unshift({...inv, id:"inv-"+Date.now()+"-"+Math.random().toString(36).slice(2,6), createdAt:Date.now()});
+  save(); if (rerender) renderGallery();
+}
+function invText(v){ return [v.name, v.pitch, v.question, v.author||"", v.place||"", ...(v.steps||[]), ...Object.values(v.hand||{}), ...Object.values(v.blender||{})].join(" ").toLowerCase(); }
+const STYLE = "Black ink line art on pure white, simple stick figures, thick black panel borders with an offset solid black drop shadow, stippled dot shading for light and atmosphere, flat and minimal, no color, no gradients, bold lowercase monospace captions under each panel.";
+function drawPrompt(v, mode){
+  const h = v.hand || {};
+  const where = (v.blender && v.blender.scene) ? v.blender.scene : "A street in Boston.";
+  const origin = `Cards: Arc ${h.arc}; Terrain ${h.terrain}; Object ${h.object}; Move ${h.move||"-"}; Mood ${h.mood}; Public ${h.public}.`;
+  if (mode === "scene"){
+    return `Single illustration of a future street scene titled "${v.name}". ${v.visual || v.pitch} Setting: ${where} The image should evoke ${String(h.mood||"").toLowerCase()} and center ${String(h.public||"").toLowerCase()}. ${STYLE} Wide horizontal composition, generous white space. ${origin}`;
+  }
+  const steps = (v.steps||[]).map((s,i)=>`Panel ${i+1}: "${i+1} · ${s.toLowerCase()}"`).join(" ");
+  return `Six-panel comic storyboard in a 3 by 2 grid titled "${v.name}", showing step by step how an everyday ${String(h.object||"object").toLowerCase()} becomes a thing from the future. Each panel keeps the same ground line and camera so the change reads as a sequence; the object changes a little more in every panel. ${steps} Setting: ${where} ${STYLE} ${origin}`;
+}
+async function copyText(btn, txt, label){
+  try{ await navigator.clipboard.writeText(txt); btn.textContent = t("copied"); }
+  catch(e){ const pre = btn.closest(".prompt")?.querySelector("pre"); if (pre){ const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } btn.textContent = t("selected"); }
+  setTimeout(()=>btn.textContent = label, 2200);
+}
+function promptBlock(v){
+  let mode = "storyboard";
+  const pre = el("pre",{}, drawPrompt(v, mode));
+  const tabs = ["storyboard","scene"].map(m => el("button",{class:"tab","aria-pressed":String(m===mode), onclick:e=>{
+    mode = m; pre.textContent = drawPrompt(v, m);
+    tabs.forEach(t => t.setAttribute("aria-pressed", String(t.dataset.m===m)));
+  },"data-m":m}, m === "storyboard" ? t("tab_story") : t("tab_scene")));
+  const copy = el("button",{class:"btn", onclick:e=>copyText(e.currentTarget, pre.textContent, t("copy_prompt"))}, t("copy_prompt"));
+  return el("div",{class:"prompt"},
+    el("div",{class:"toolbar"}, el("span",{class:"eyebrow"},t("draw_prompt")), el("div",{class:"row"}, tabs, copy)),
+    pre);
+}
+/* ---------- images: upload a drawing, or generate one with an OpenAI key ---------- */
+function fileToJpeg(file, max=900, q=.8){
+  return new Promise((res, rej) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement("canvas");
+      c.width = Math.round(img.width*k); c.height = Math.round(img.height*k); c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", q)); };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error(t("img_err"))); };
+    img.src = url;
+  });
+}
+function dataUrlToBlob(d){ const [h, b] = d.split(","); const mime = (h.match(/data:(.*?);/)||[])[1] || "image/jpeg"; const bin = atob(b); const u = new Uint8Array(bin.length); for (let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new Blob([u],{type:mime}); }
+async function uploadDrawing(v){
+  if (!sharedOK() || !v.image) return "";
+  const path = "d-" + Date.now() + "-" + Math.random().toString(36).slice(2,8) + ".jpg";
+  const r = await fetch(SHARED.url.replace(/\/$/,"") + "/storage/v1/object/drawings/" + path, {method:"POST",
+    headers:{"apikey":SHARED.anonKey, "authorization":"Bearer "+SHARED.anonKey, "content-type":"image/jpeg", "x-upsert":"false"}, body: dataUrlToBlob(v.image)});
+  if (!r.ok) throw new Error(t("upload_err") + (await r.text()).slice(0,120));
+  return SHARED.url.replace(/\/$/,"") + "/storage/v1/object/public/drawings/" + path;
+}
+async function generateImage(v){
+  if (!api || !api.key || api.provider !== "openai") throw {code:"no_image_api"};
+  const model = api.imageModel || ($("#apiImageModel") && $("#apiImageModel").value.trim()) || "gpt-image-1";
+  const body = {model, prompt: drawPrompt(v, "scene"), size:"1024x1024", n:1};
+  if (model.startsWith("dall-e")) body.response_format = "b64_json";
+  const r = await fetch("https://api.openai.com/v1/images/generations", {method:"POST", headers:{"content-type":"application/json","authorization":"Bearer "+api.key}, body: JSON.stringify(body)});
+  if (!r.ok){ let m=""; try{ m = (await r.json()).error?.message || ""; }catch(e){} throw {code:"api_"+r.status, message:m}; }
+  const j = await r.json(); const d = j.data && j.data[0] || {};
+  if (d.b64_json) return "data:image/png;base64," + d.b64_json;
+  if (d.url){ const blob = await (await fetch(d.url)).blob(); return await fileToJpeg(blob); }
+  throw {code:"invalid_json"};
+}
+function imageControls(v, note){
+  const canUpload = !v.shared;
+  if (!canUpload) return [];
+  if (!(v.image || v.imageUrl)) return [];
+  const file = el("input",{type:"file", accept:"image/*", id:"img-"+v.id, hidden:true, onchange: async e => {
+    const f = e.target.files[0]; if (!f) return; note.textContent = t("processing");
+    try{ const d = await fileToJpeg(f); v.image = d; save(); renderGallery(); }catch(err){ note.textContent = err.message || t("img_err"); }
+  }});
+  const has = !!(v.image || v.imageUrl);
+  const out = [el("button",{class:"btn", onclick:()=>file.click()}, t("change_drawing")), file, genButton(v, note, true),
+    el("button",{class:"btn ghost", onclick:()=>{ delete v.image; delete v.imageUrl; save(); renderGallery(); }}, t("remove_drawing"))];
+  return out;
+}
+function genButton(v, note, has){
+  return el("button",{class:"btn ghost", onclick: async e => {
+    const b = e.currentTarget;
+    if (!(api && api.key && api.provider === "openai")){
+      try{ await navigator.clipboard.writeText(drawPrompt(v, "scene")); note.textContent = t("gen_nokey_copied"); }catch(err){ note.textContent = t("gen_nokey"); }
+      const panel = $("#apiPanel"); if (panel && !panel.hidden) panel.open = true;
+      return;
+    }
+    b.disabled = true; note.textContent = t("generating");
+    try{ const d = await generateImage(v); v.image = await fileToJpeg(dataUrlToBlob(d)); save(); renderGallery(); }
+    catch(err){ note.textContent = errCopy(err); b.disabled = false; }
+  }}, has ? t("regen") : t("gen"));
+}
+function dropZone(v, note){
+  const file = el("input",{type:"file", accept:"image/*", id:"img-"+v.id, hidden:true, onchange: async e => {
+    const f = e.target.files[0]; if (!f) return; note.textContent = t("processing");
+    try{ const d = await fileToJpeg(f); v.image = d; save(); renderGallery(); }catch(err){ note.textContent = err.message || t("img_err"); }
+  }});
+  const zone = el("div",{class:"dropzone", role:"button", tabindex:"0", "aria-label":t("upload_drawing"),
+    onclick:()=>file.click(), onkeydown:e=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); file.click(); } },
+    ondragover:e=>{ e.preventDefault(); zone.classList.add("over"); }, ondragleave:()=>zone.classList.remove("over"),
+    ondrop: async e => { e.preventDefault(); zone.classList.remove("over"); const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (!f) return; note.textContent = t("processing");
+      try{ const d = await fileToJpeg(f); v.image = d; save(); renderGallery(); }catch(err){ note.textContent = err.message || t("img_err"); } }},
+    el("span",{class:"dz-ico"}, "+"), el("span",{class:"dz-t"}, t("dz_title")), el("span",{class:"note"}, t("dz_sub")));
+  const gen = genButton(v, note, false); gen.className = "btn"; gen.addEventListener("click", e => e.stopPropagation());
+  return el("div",{class:"dropwrap"}, zone, file, el("div",{class:"row"}, el("button",{class:"btn", onclick:()=>file.click()}, t("upload_drawing")), gen));
+}
+/* ---------- gallery: local (this browser) and shared (everyone) ---------- */
+function currentList(){ return galMode === "shared" ? shared.map(fromRow) : inventions.filter(v => !v.example || v.lang === uiLang); }
+function renderFilters(){
+  const src = currentList();
+  const terrains = [...new Set(src.map(v => v.hand && v.hand.terrain).filter(Boolean))].sort();
+  const box = $("#filters"); box.replaceChildren();
+  const mk = (val, label, get, set) => el("button",{class:"tab","aria-pressed":String(get()===val), onclick:()=>{ set(val); renderGallery(); }}, label);
+  box.append(mk("", t("all"), ()=>terrainFilter, v=>terrainFilter=v), ...terrains.map(t => mk(t, t, ()=>terrainFilter, v=>terrainFilter=v)));
+  const box2 = $("#filters2"); box2.replaceChildren(); box2.hidden = galMode !== "shared";
+  if (galMode === "shared"){
+    const places = [...new Set(src.map(v => v.place).filter(Boolean))].sort();
+    box2.append(el("span",{class:"eyebrow"},t("place")), mk("", t("all"), ()=>placeFilter, v=>placeFilter=v), ...places.map(t => mk(t, t, ()=>placeFilter, v=>placeFilter=v)),
+      el("button",{class:"tab","aria-pressed":String(onlyMine), onclick:()=>{ onlyMine = !onlyMine; renderGallery(); }}, t("only_mine")));
+  }
+}
+function publishForm(v, host){
+  const name = el("input",{placeholder:t("name_ph"), "aria-label":t("name_aria"), value: store.get("fp.authorName","") || ""});
+  const place = el("input",{placeholder:t("place_ph"), "aria-label":t("place_aria"), value: store.get("fp.place","") || ""});
+  const note = el("span",{class:"note"}, store.get("fp.place","") ? "" : t("detecting"));
+  const form = el("form",{class:"pubform", onsubmit: async e => {
+    e.preventDefault(); const b = form.querySelector("button[type=submit]"); b.disabled = true; note.textContent = t("publishing");
+    try{
+      store.set("fp.authorName", name.value.trim()); store.set("fp.place", place.value.trim());
+      if (v.image && !v.imageUrl) v.imageUrl = await uploadDrawing(v);
+      await publishInvention(v, name.value.trim(), place.value.trim());
+      renderGallery();
+    }catch(err){ note.textContent = (err && err.message) || t("pub_err"); b.disabled = false; }
+  }}, name, place, el("button",{class:"btn orange", type:"submit"}, t("publish")), el("button",{class:"btn ghost", type:"button", onclick:()=>form.replaceWith(pubButton(v))}, t("cancel")), note);
+  if (!place.value) detectPlace().then(p => { if (!place.value){ place.value = p; note.textContent = p ? t("place_hint") : t("place_fail"); } });
+  return form;
+}
+function pubButton(v){
+  const b = el("button",{class:"btn orange"}, t("publish_shared"));
+  b.onclick = () => b.replaceWith(publishForm(v));
+  return b;
+}
+function invCard(v, n, total){
+  const steps = v.steps && v.steps.length ? v.steps : null;
+  const when = v.createdAt > 10 ? new Date(v.createdAt).toLocaleDateString(uiLang === "es" ? "es" : "en", {day:"2-digit", month:"short", year:"numeric"}) : "";
+  const note = el("span",{class:"note"});
+  const tags = el("div",{class:"row tags"});
+  if (v.shared){
+    if (v.mine) tags.append(el("span",{class:"example-tag mine"},t("mine_tag")));
+    tags.append(el("span",{class:"eyebrow"}, [v.author, v.place, when].filter(Boolean).join(" · ") || t("anon")));
+  } else {
+    tags.append(v.example ? el("span",{class:"example-tag"},t("example")) : el("span",{class:"example-tag mine"},t("yours")));
+    tags.append(el("span",{class:"eyebrow"}, v.sharedId ? (t("published") + (v.place ? " · " + v.place : "")) : (when || "")));
+  }
+  const h = v.hand || {};
+  const chips = el("div",{class:"chips"}, SUITS.map(s => {
+    const val = s.k === "arc" ? String(h.arc||"").replace(" · within "," · ").replace(" · dentro de "," · ") : (h[s.k] || "");
+    return val ? el("span",{class:"chip"+(s.k==="terrain"?" hot":"")+(s.k==="move"?" k":""), title:t("lab_"+s.k)}, val) : null;
+  }));
+  const actions = el("div",{class:"row actions"},
+    el("button",{class:"btn", onclick:()=>{ hand={...v.hand}; for (const s of SUITS) if (!hand[s.k]) hand[s.k] = pick(decks[s.k]); locks={object:true, terrain:true}; save(); renderHand(); vary(); document.getElementById("var-section").scrollIntoView({behavior:"smooth"}); }}, t("vary_btn")),
+    ...imageControls(v, note));
+  if (v.shared){
+    actions.append(el("button",{class:"btn ghost", onclick:()=>{ addInvention({hand:v.hand, name:v.name, pitch:v.pitch, steps:v.steps, question:v.question, visual:v.visual, blender:v.blender, rejected:v.rejected, imageUrl:v.imageUrl, fromShared:v.id}); galMode="local"; setMode(); }}, t("copy_to_mine")));
+    if (v.mine){
+      const del = el("button",{class:"btn ghost"}, t("del_shared"));
+      del.onclick = () => {
+        const yes = el("button",{class:"btn orange", onclick: async () => { yes.disabled = true; note.textContent = t("deleting"); try{ await deleteShared(v.id.replace(/^sh-/,"")); renderGallery(); }catch(err){ note.textContent = err.message || t("del_err"); confirmRow.replaceWith(del); } }}, t("del_yes"));
+        const no = el("button",{class:"btn ghost", onclick:()=>confirmRow.replaceWith(del)}, t("cancel"));
+        const confirmRow = el("span",{class:"row", style:"gap:4px"}, el("span",{class:"note"}, t("del_sure")), yes, no);
+        del.replaceWith(confirmRow);
+      };
+      actions.append(del);
+    }
+  } else {
+    if (sharedOK() && !v.sharedId) actions.append(pubButton(v));
+    actions.append(el("button",{class:"btn ghost", onclick:()=>{ inventions = inventions.filter(x=>x.id!==v.id); if (v.example){ removedEx.push(v.id); store.set("fp.removedEx", removedEx); } save(); renderGallery(); }}, t("remove")));
+  }
+  actions.append(note);
+  const img = (v.image || v.imageUrl) ? el("div",{class:"pic"}, el("img",{src: v.image || v.imageUrl, alt:t("drawing_of")+v.name, loading:"lazy"})) : (v.shared ? null : dropZone(v, note));
+  const more = el("details",{class:"more"},
+    el("summary",{}, t("more")),
+    el("div",{class:"moreb"},
+      el("p",{class:"origin-s"}, sentenceNode(h,"b")),
+      v.rejected && v.rejected.length ? el("p",{class:"note"}, t("rejected"), v.rejected.join(" · ")) : null,
+      steps ? el("ol",{class:"steps"}, steps.map(c => el("li",{}, c))) : null,
+      v.question ? el("div",{}, el("span",{class:"eyebrow"},t("deliberate")), el("p",{class:"question"}, v.question)) : null,
+      v.blender ? el("div",{}, el("span",{class:"eyebrow"},t("blender_brief")),
+        el("dl",{class:"brief"}, ["scene","motion","light","sound"].flatMap(k => [el("dt",{},k), el("dd",{}, v.blender[k])]))) : null,
+      promptBlock(v)));
+  return el("article",{class:"inv"+(img?" has-pic":"")}, img,
+    el("div",{class:"body"}, tags, el("h3",{}, v.name), el("p",{class:"pitch"}, v.pitch), chips, actions, more));
+}
+async function setMode(){
+  document.querySelectorAll("#galMode .tab").forEach(t => t.setAttribute("aria-pressed", String(t.dataset.mode === galMode)));
+  const sn = $("#sharedNote");
+  if (galMode === "shared"){
+    if (!sharedOK()){ sn.hidden = false; sn.textContent = t("shared_off"); renderGallery(); return; }
+    if (!sharedLoaded){ sn.hidden = false; sn.textContent = t("shared_loading"); await loadShared(); }
+    sn.hidden = !sharedError; sn.textContent = sharedError;
+  } else sn.hidden = true;
+  renderGallery();
+}
+function renderGallery(){
+  const q = $("#q").value.trim().toLowerCase();
+  renderFilters();
+  const src = currentList();
+  const list = src.filter(v => (!q || invText(v).includes(q)) && (!terrainFilter || (v.hand && v.hand.terrain === terrainFilter))
+    && (galMode !== "shared" || ((!placeFilter || v.place === placeFilter) && (!onlyMine || v.mine))));
+  $("#count").textContent = `· ${pad(src.length)}`;
+  const g = $("#gallery"); g.replaceChildren();
+  if (!list.length){
+    const msg = galMode === "shared" ? (sharedError ? "" : (src.length ? t("no_match") : t("shared_empty"))) : ((q||terrainFilter) ? t("no_match") : t("local_empty"));
+    if (msg) g.append(el("p",{class:"note"}, msg)); return;
+  }
+  list.forEach((v, n) => g.append(invCard(v, n, list.length)));
+}
+document.querySelectorAll("#galMode .tab").forEach(t => t.onclick = () => { galMode = t.dataset.mode; terrainFilter = ""; placeFilter = ""; setMode(); });
+
+/* ---------- decks editor ---------- */
+function renderEditor(){
+  const g = $("#editgrid"); g.replaceChildren();
+  SUITS.forEach((s,n) => g.append(el("label",{for:"ta-"+s.k}, pad(n+1)+" "+t("lab_"+s.k), el("textarea",{id:"ta-"+s.k}, decks[s.k].join("\n")))));
+}
+function save(){ store.set("fp.decks2",decksAll); store.set("fp.locks",locks); store.set("fp.hand",hand); store.set("fp.inventions",inventions); }
+
+/* ---------- wiring ---------- */
+$("#deal").onclick = () => { hand = deal(hand); save(); renderHand(); };
+$("#vary").onclick = () => vary();
+$("#inventAll").onclick = () => inventAll();
+$("#stopAll").onclick = () => allCtl && allCtl.abort();
+$("#q").oninput = renderGallery;
+$("#copyJson").onclick = async () => {
+  const txt = JSON.stringify(inventions, null, 2);
+  try{ await navigator.clipboard.writeText(txt); $("#copyJson").textContent = t("copied"); }
+  catch(e){ const ta = el("textarea",{}, txt); document.body.append(ta); ta.select(); $("#copyJson").textContent = t("select_copy"); setTimeout(()=>ta.remove(), 8000); }
+  setTimeout(()=>$("#copyJson").textContent = t("copy_json"), 2000);
+};
+$("#saveDecks").onclick = () => {
+  for (const s of SUITS){ const lines = $("#ta-"+s.k).value.split("\n").map(x=>x.trim()).filter(Boolean); if (lines.length) decks[s.k] = lines; }
+  save(); renderHand(); $("#deckNote").textContent = t("decks_saved");
+};
+$("#resetDecks").onclick = () => { decksAll[uiLang] = structuredClone(DEFAULTS[uiLang]); decks = decksAll[uiLang]; save(); renderEditor(); renderHand(); $("#deckNote").textContent = t("decks_reset"); };
+$("#copyPrompt").onclick = async () => {
+  if (!batch.length) vary();
+  const txt = buildPrompt(batch);
+  try{ await navigator.clipboard.writeText(txt); $("#aiNote").textContent = t("prompt_copied",{n:batch.length}); }
+  catch(e){ $("#importBox").value = txt; $("#import").open = true; $("#aiNote").textContent = t("prompt_copy_fail"); }
+};
+$("#apiSave").onclick = () => {
+  const key = $("#apiKey").value.trim(); if (!key){ $("#apiNote").textContent = t("key_first"); return; }
+  const provider = $("#apiProvider").value, model = $("#apiModel").value.trim(), remember = $("#apiRemember").checked, imageModel = $("#apiImageModel").value.trim();
+  api = {provider, key, model, remember, imageModel};
+  try{ if (remember){ localStorage.setItem("fp.api", JSON.stringify(api)); sessionStorage.removeItem("fp.api"); } else { sessionStorage.setItem("fp.api", JSON.stringify(api)); localStorage.removeItem("fp.api"); } }catch(e){}
+  $("#inventAll").hidden = false; renderGrid(); renderGallery();
+  $("#apiNote").textContent = t("activated") + provider + " · " + (model || apiDefaultModel(provider)) + (remember ? t("remembered") : t("tab_only"));
+  $("#aiNote").textContent = t("ai_on",{n:(batch.length || 8)});
+};
+$("#apiClear").onclick = () => {
+  api = null; try{ localStorage.removeItem("fp.api"); sessionStorage.removeItem("fp.api"); }catch(e){}
+  $("#apiKey").value = ""; $("#inventAll").hidden = !canAI(); renderGrid(); $("#apiNote").textContent = t("key_forgotten");
+};
+$("#importBtn").onclick = () => {
+  const raw = $("#importBox").value; const a = raw.indexOf("["), b = raw.lastIndexOf("]");
+  let list; try{ list = JSON.parse(a >= 0 && b > a ? raw.slice(a, b+1) : raw); }catch(e){ $("#importNote").textContent = t("import_bad"); return; }
+  if (!Array.isArray(list)) list = [list];
+  let n = 0;
+  list.forEach((o, j) => {
+    const i = Number.isInteger(Number(o && o.i)) ? Number(o.i) : j;
+    const h = batch[i] || (o && o.hand) || hand;
+    const inv = normalize(o, h); if (inv){ addInvention(inv, false); n++; }
+  });
+  save(); renderGallery(); $("#importBox").value = "";
+  $("#importNote").textContent = n ? t("imported",{n}) : t("import_none");
+};
+
+decks = decksAll[uiLang];
+if (!hand){
+  hand = {...(uiLang === "es" ? EXAMPLES_ES : EXAMPLES_EN)[0].hand};
+  locks = {object:true, terrain:true};
+}
+for (const s of SUITS) if (!hand[s.k]) hand[s.k] = pick(decks[s.k]);
+for (const v of inventions) if (v.hand && !v.hand.move) v.hand.move = "";
+applyLang(); renderHand(); renderEditor(); vary(); renderGallery();
+$("#inventAll").hidden = true;
+$("#aiNote").textContent = t("connecting");
+
+(async () => {
+  try{ sample = window.claude ? await window.claude.use("sample") : null; }catch(e){ sample = null; }
+  if (sample){ $("#inventAll").hidden = false; $("#aiNote").textContent = t("ai_note_sample"); }
+  else {
+    $("#apiPanel").hidden = false;
+    if (api && api.key){ $("#inventAll").hidden = false; $("#aiNote").textContent = t("ai_note_key",{p:(api.provider||"anthropic") + " · " + (api.model || apiDefaultModel(api.provider))}); $("#apiProvider").value = api.provider || "anthropic"; $("#apiModel").value = api.model || ""; $("#apiKey").value = api.key; $("#apiRemember").checked = !!api.remember; $("#apiImageModel").value = api.imageModel || ""; }
+    else $("#aiNote").textContent = t("ai_note_nokey");
+  }
+  renderGrid();
+  try{
+    const dl = window.claude ? await window.claude.use("downloads") : null;
+    $("#dlJson").hidden = false;
+    $("#dlJson").onclick = async () => {
+      const data = JSON.stringify(inventions, null, 2);
+      if (dl){ try{ await dl.save({filename:"future-publics-inventions.json", data}); }catch(e){} return; }
+      const url = URL.createObjectURL(new Blob([data], {type:"application/json"}));
+      const a = el("a",{href:url, download:"future-publics-inventions.json"}); document.body.append(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    };
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>
